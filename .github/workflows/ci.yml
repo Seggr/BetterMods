@@ -33,7 +33,7 @@ jobs:
       artifact-name: ${{ steps.package.outputs.artifact-name }}
     steps:
       - name: Check out
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -55,7 +55,7 @@ jobs:
         run: bash .github/scripts/package.sh bin/Release/Mods/bettermods dist
 
       - name: Upload the mod zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.package.outputs.artifact-name }}
           path: ${{ steps.package.outputs.zip-path }}
