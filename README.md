@@ -32,7 +32,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 | | |
 |---|---|
 | Side | **Client only.** Servers neither need nor see it; it works on any server. |
-| Game version | **Vintage Story 1.23.0-pre.1 or newer** (1.23.x). For 1.22, use the BetterMods 1.2.0 release. |
+| Game version | **Vintage Story 1.23.0-pre.1 or newer** (1.23.x). For 1.22, use the BetterMods 1.2.1 release. |
 | Open it | Main menu: **Mods** screen. In game: the **Mod Profiles** dialog - bind a key to it under **Settings > Controls** (none by default). |
 | Restart needed? | Only when a profile switches a mod you already used this session to a *different version*. Enabling and disabling mods never needs one. |
 

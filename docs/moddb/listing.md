@@ -33,7 +33,7 @@ Suggested **tags** (use whichever of these the DB's tag list offers): `Utility`,
 
 **Changelogs** belong to each release in the **Files** tab (one per uploaded zip), not in the
 description. On every release, set the game version tags to the versions it actually supports:
-1.3.x is `1.23.0-pre.1` and later 1.23 builds; the 1.2.0 file is the one for 1.22.
+1.3.x is `1.23.0-pre.1` and later 1.23 builds; the 1.2.1 file is the one for 1.22 (`1.22.0` through `1.22.7`).
 
 ## Screenshots
 
