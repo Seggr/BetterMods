@@ -39,8 +39,6 @@ namespace BetterMods.Playstyles
         public bool ReadOnly;
 
         public string Author;
-        public string CreatedBy;
-        public string GameVersion;
 
         /// <summary>World-config entries dropped while parsing (non-primitive values, bad keys, over the cap).</summary>
         public int RejectedKeys;

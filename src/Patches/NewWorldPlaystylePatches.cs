@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BetterMods.Gui;
 using BetterMods.Playstyles;
 using HarmonyLib;
+using Vintagestory.API.Common;
 using Vintagestory.Client;
 using Vintagestory.Common;
 
@@ -116,6 +117,26 @@ namespace BetterMods.Patches
         public static void Postfix(GuiScreenSingleplayerNewWorld __instance)
         {
             NewWorldPlaystyleUi.UpdateButtons(__instance);
+        }
+    }
+
+    /// <summary>
+    /// A custom entry's tooltip on the new-world list gets one extra line naming the settings that were
+    /// skipped (missing mods, unknown keys, invalid values) - the row itself stays clean. The new-world
+    /// screen is the only caller of <c>ToRichText</c> (InitGui and OnClickCellLeft); signature checked
+    /// against the live 1.23 VintagestoryLib.dll: <c>string ToRichText(PlayStyle playstyle, bool withCustomConfigs)</c>.
+    /// </summary>
+    [HarmonyPatch(typeof(WorldConfig), nameof(WorldConfig.ToRichText), new[] { typeof(PlayStyle), typeof(bool) })]
+    public static class WorldConfig_ToRichText_Patch
+    {
+        [HarmonyPrepare]
+        public static bool Prepare() => PatchTarget.Exists(typeof(WorldConfig), nameof(WorldConfig.ToRichText), new[] { typeof(PlayStyle), typeof(bool) });
+
+        // __0, not the parameter's name, so a rename in a game update cannot break the binding.
+        [HarmonyPostfix]
+        public static void Postfix(PlayStyle __0, ref string __result)
+        {
+            NewWorldPlaystyleUi.AppendTooltipNotes(__0, ref __result);
         }
     }
 

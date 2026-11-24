@@ -24,12 +24,20 @@ namespace BetterMods.Playstyles
     /// validates none of it (a dropdown value outside <c>Values</c> reaches the customize screen as
     /// <c>IndexOf</c> -1).
     /// </para>
+    /// <para>
+    /// The format is deliberately LENIENT: there is no version number to check, unknown top-level
+    /// fields (including the <c>formatVersion</c>, <c>gameVersion</c> and <c>createdBy</c> that older
+    /// BetterMods builds wrote) are ignored, and <c>format</c> is an optional type marker - the
+    /// extension already says what the file is. The only thing that keeps a file out of the list is
+    /// one that cannot be read at all, or that has no usable <c>basePlaystyle</c>.
+    /// </para>
     /// </summary>
     public static class PlaystyleFormat
     {
         public const string Extension = ".vsplaystyle";
+
+        /// <summary>The optional <c>format</c> marker written into every saved file. Never checked on read.</summary>
         public const string FormatName = "vsplaystyle";
-        public const int FormatVersion = 1;
 
         /// <summary>
         /// Prefix of every menu-side custom playstyle code. Such a code must never reach the server:
@@ -123,9 +131,10 @@ namespace BetterMods.Playstyles
         // ---------------------------------------------------------------- reading
 
         /// <summary>
-        /// Parses one file's text. Returns null, with <paramref name="error"/> set, when the file is
-        /// not a usable <c>.vsplaystyle</c> at all; individual bad world-config entries only count
-        /// towards <see cref="PlaystyleFile.RejectedKeys"/>.
+        /// Parses one file's text. Returns null, with <paramref name="error"/> set, only when the file
+        /// is not JSON, is too large, or has no plain built-in <c>basePlaystyle</c>. Everything else is
+        /// tolerated: <c>format</c>, any version field and any unknown field are ignored, and bad
+        /// world-config entries only count towards <see cref="PlaystyleFile.RejectedKeys"/>.
         /// </summary>
         public static PlaystyleFile Parse(string json, string slug, out string error)
         {
@@ -161,34 +170,8 @@ namespace BetterMods.Playstyles
                 return null;
             }
 
-            if (!string.Equals(StringOf(root["format"]), FormatName, StringComparison.OrdinalIgnoreCase))
-            {
-                error = "\"format\" is not \"" + FormatName + "\"";
-                return null;
-            }
-
-            JToken versionToken = root["formatVersion"];
-            if (versionToken != null)
-            {
-                if (versionToken.Type != JTokenType.Integer)
-                {
-                    error = "\"formatVersion\" is not a whole number";
-                    return null;
-                }
-
-                long version = versionToken.Value<long>();
-                if (version > FormatVersion)
-                {
-                    error = "formatVersion " + version + " is newer than this BetterMods understands (" + FormatVersion + ")";
-                    return null;
-                }
-
-                if (version < 1)
-                {
-                    error = "formatVersion " + version + " is not valid";
-                    return null;
-                }
-            }
+            // "format", "formatVersion", "gameVersion", "createdBy" and any other top-level field this
+            // build does not use are ignored on purpose: a version number never keeps a file out.
 
             string baseCode = StringOf(root["basePlaystyle"])?.Trim();
             if (!IsPlainCode(baseCode))
@@ -210,8 +193,6 @@ namespace BetterMods.Playstyles
                 Name = ModUpdateRules.AsciiLine(StringOf(root["name"]), MaxNameLength),
                 Description = ModUpdateRules.AsciiLine(StringOf(root["description"]), MaxDescriptionLength),
                 Author = ModUpdateRules.AsciiLine(StringOf(root["author"]), MaxNameLength),
-                CreatedBy = ModUpdateRules.AsciiLine(StringOf(root["createdBy"]), MaxNameLength),
-                GameVersion = ModUpdateRules.AsciiLine(StringOf(root["gameVersion"]), 40),
                 ReadOnly = IsTrue(root["readOnly"]),
                 WorldHeight = IntOf(root["worldHeight"])
             };
@@ -384,7 +365,12 @@ namespace BetterMods.Playstyles
 
         // ---------------------------------------------------------------- writing
 
-        /// <summary>The file text for <paramref name="file"/>, indented, values as strings like vanilla's playstyles.</summary>
+        /// <summary>
+        /// The file text for <paramref name="file"/>, indented, values as strings like vanilla's
+        /// playstyles. No version or tool fields: <c>format</c>, <c>name</c>, <c>description</c>,
+        /// <c>basePlaystyle</c>, <c>worldHeight</c>, <c>worldConfig</c>, <c>settingMods</c> (when
+        /// any), <c>readOnly</c>, <c>author</c>.
+        /// </summary>
         public static string Serialize(PlaystyleFile file)
         {
             JObject config = new JObject();
@@ -396,7 +382,6 @@ namespace BetterMods.Playstyles
             JObject root = new JObject
             {
                 ["format"] = FormatName,
-                ["formatVersion"] = FormatVersion,
                 ["name"] = file.Name ?? "",
                 ["description"] = file.Description ?? "",
                 ["basePlaystyle"] = file.BaseCode,
@@ -418,8 +403,6 @@ namespace BetterMods.Playstyles
 
             root["readOnly"] = file.ReadOnly;
             root["author"] = file.Author ?? "";
-            root["createdBy"] = file.CreatedBy ?? "";
-            root["gameVersion"] = file.GameVersion ?? "";
 
             return root.ToString(Formatting.Indented);
         }

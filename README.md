@@ -42,20 +42,20 @@ update your mods from the mod DB - all inside the game's own Mods screen.
   - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
 - [BetterMods](#bettermods)
   - [Contents](#contents)
-  - [Profiles](#profiles)
-  - [The in-game Mod Profiles dialog](#the-in-game-mod-profiles-dialog)
   - [Loading at startup (the startup hook)](#loading-at-startup-the-startup-hook)
     - [The easy way: Add Shortcut (Windows)](#the-easy-way-add-shortcut-windows)
     - [What the shortcut does](#what-the-shortcut-does)
     - [BetterMods installs and updates the hook itself](#bettermods-installs-and-updates-the-hook-itself)
     - [Making the shortcut by hand (Windows)](#making-the-shortcut-by-hand-windows)
     - [Linux and macOS](#linux-and-macos)
-  - [Mod cards](#mod-cards)
-  - [Several versions of one mod](#several-versions-of-one-mod)
-  - [Update checking](#update-checking)
-  - [Open mod page and trusted links](#open-mod-page-and-trusted-links)
-  - [Fix dependencies](#fix-dependencies)
-  - [Core-mod protection](#core-mod-protection)
+  - [Profiles](#profiles)
+  - [The in-game Mod Profiles dialog](#the-in-game-mod-profiles-dialog)
+    - [Mod cards](#mod-cards)
+    - [Several versions of one mod](#several-versions-of-one-mod)
+    - [Update checking](#update-checking)
+    - [Open mod page and trusted links](#open-mod-page-and-trusted-links)
+    - [Fix dependencies](#fix-dependencies)
+    - [Core-mod protection](#core-mod-protection)
   - [Worlds remember their profile and mods](#worlds-remember-their-profile-and-mods)
   - [Saved playstyles (Accepted feature creep)](#saved-playstyles-accepted-feature-creep)
     - [For mod authors: the `.vsplaystyle` format](#for-mod-authors-the-vsplaystyle-format)
@@ -67,63 +67,6 @@ update your mods from the mod DB - all inside the game's own Mods screen.
   - [Known limitations](#known-limitations)
   - [Troubleshooting and bug reports](#troubleshooting-and-bug-reports)
   - [License](#license)
-
-## Profiles
-
-A profile is a named list of which mods are on and which are off. **Profile 1** is created from
-whatever was enabled when BetterMods first ran, so nothing changes until you change it.
-
-- **Tabs** - one per profile, above the mod list (the strip scrolls when they do not fit).
-  Left-click a tab to view and edit that profile.
-- **`+`** (the last tab) - creates "Profile N" as a **copy of the profile you are viewing** and
-  switches to it.
-- **Right-click a tab** - rename it (**Enter** saves, **Esc** cancels) or **Delete** it (click a
-  second time to confirm). The last remaining profile cannot be deleted. Names need not be unique.
-
-  ![Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels](docs/moddb/screenshots/02-rename-panel.png)
-
-- **Viewed vs active.** The selected tab is the *viewed* profile - the one your clicks edit. The
-  *active* profile is the one the game actually loads. The Mods screen always opens on the active one.
-- **Toggling a mod** edits the viewed profile only. On the main menu, if the viewed profile is also
-  the active one, the change goes straight to the game, exactly like vanilla; otherwise nothing
-  reaches the game until you apply it.
-- **Apply Profile** makes the viewed profile active: it writes its on/off list into the game's own
-  settings and reloads the mod list. The game then boots with that set on every launch, with or
-  without BetterMods.
-- **Deleting the active profile** applies the first remaining one, so the game and the tabs always
-  agree.
-- **Mods the game changes itself** (for example one it installs when you join a server) are folded
-  into the active profile, so the next Apply Profile does not silently undo them.
-- **Blocked mods stay blocked.** A profile cannot re-enable a mod on the game's official blocklist.
-
-Profiles live in `%APPDATA%\VintagestoryData\ModConfig\bettermods.json`, with a `.bak` of the last
-good save. If that file exists but cannot be read (locked by another program, for example),
-BetterMods shows **"Not saving - config unreadable"** and writes nothing until it can, so your
-profiles are never overwritten.
-
-## The in-game Mod Profiles dialog
-
-The same tabs, cards, version picker and **Apply Profile**, inside a running world - so you never
-*need* the main menu. Bind a key to *Mod Profiles* under **Settings > Controls** (none by default);
-that key opens and closes the dialog.
-
-In game, toggling edits the viewed profile only (even the active one), and **Apply Profile takes
-effect the next time you load a world** - mods cannot be unloaded from the world you are in. No
-game restart is needed, except in the version case under
-[Several versions of one mod](#several-versions-of-one-mod).
-
-| | Main-menu Mods screen | In game |
-|---|:---:|:---:|
-| Create, rename, delete, switch profiles | yes | yes |
-| Toggle mods, pick versions, Apply Profile | yes | yes (applies at next world load) |
-| Card tooltips, update marker, `(Retracted)` note | yes | yes |
-| Update check | yes | yes |
-| Download and install updates | yes | no - the status line points you to the main menu |
-| Fix dependencies: switch on installed versions | yes | yes |
-| Fix dependencies: download missing ones | yes | no |
-| Open mod page | yes | yes |
-| Add Shortcut | yes | yes |
-| Prompt when starting a world with the wrong profile | yes | - |
 
 ## Loading at startup (the startup hook)
 
@@ -225,7 +168,64 @@ exec '<game folder>/Vintagestory' "$@"
 >   there stops the game launching, every game update overwrites the file, and an uninstall leaves
 >   the setting behind.
 
-## Mod cards
+## Profiles
+
+A profile is a named list of which mods are on and which are off. **Profile 1** is created from
+whatever was enabled when BetterMods first ran, so nothing changes until you change it.
+
+- **Tabs** - one per profile, above the mod list (the strip scrolls when they do not fit).
+  Left-click a tab to view and edit that profile.
+- **`+`** (the last tab) - creates "Profile N" as a **copy of the profile you are viewing** and
+  switches to it.
+- **Right-click a tab** - rename it (**Enter** saves, **Esc** cancels) or **Delete** it (click a
+  second time to confirm). The last remaining profile cannot be deleted. Names need not be unique.
+
+  ![Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels](docs/moddb/screenshots/02-rename-panel.png)
+
+- **Viewed vs active.** The selected tab is the *viewed* profile - the one your clicks edit. The
+  *active* profile is the one the game actually loads. The Mods screen always opens on the active one.
+- **Toggling a mod** edits the viewed profile only. On the main menu, if the viewed profile is also
+  the active one, the change goes straight to the game, exactly like vanilla; otherwise nothing
+  reaches the game until you apply it.
+- **Apply Profile** makes the viewed profile active: it writes its on/off list into the game's own
+  settings and reloads the mod list. The game then boots with that set on every launch, with or
+  without BetterMods.
+- **Deleting the active profile** applies the first remaining one, so the game and the tabs always
+  agree.
+- **Mods the game changes itself** (for example one it installs when you join a server) are folded
+  into the active profile, so the next Apply Profile does not silently undo them.
+- **Blocked mods stay blocked.** A profile cannot re-enable a mod on the game's official blocklist.
+
+Profiles live in `%APPDATA%\VintagestoryData\ModConfig\bettermods.json`, with a `.bak` of the last
+good save. If that file exists but cannot be read (locked by another program, for example),
+BetterMods shows **"Not saving - config unreadable"** and writes nothing until it can, so your
+profiles are never overwritten.
+
+## The in-game Mod Profiles dialog
+
+The same tabs, cards, version picker and **Apply Profile**, inside a running world - so you never
+*need* the main menu. Bind a key to *Mod Profiles* under **Settings > Controls** (none by default);
+that key opens and closes the dialog.
+
+In game, toggling edits the viewed profile only (even the active one), and **Apply Profile takes
+effect the next time you load a world** - mods cannot be unloaded from the world you are in. No
+game restart is needed, except in the version case under
+[Several versions of one mod](#several-versions-of-one-mod).
+
+| | Main-menu Mods screen | In game |
+|---|:---:|:---:|
+| Create, rename, delete, switch profiles | yes | yes |
+| Toggle mods, pick versions, Apply Profile | yes | yes (applies at next world load) |
+| Card tooltips, update marker, `(Retracted)` note | yes | yes |
+| Update check | yes | yes |
+| Download and install updates | yes | no - the status line points you to the main menu |
+| Fix dependencies: switch on installed versions | yes | yes |
+| Fix dependencies: download missing ones | yes | no |
+| Open mod page | yes | yes |
+| Add Shortcut | yes | yes |
+| Prompt when starting a world with the wrong profile | yes | - |
+
+### Mod cards
 
 Each row of the mod list is redrawn as a **fixed-height card**: icon on the left, title and version
 on top, a status line only when there is a load error, and a row of buttons at the bottom.
@@ -246,7 +246,7 @@ on top, a status line only when there is a load error, and a row of buttons at t
 If a game update means the cards can no longer be drawn safely, the rows stay vanilla and the update
 and dependency information is added to the row text instead.
 
-## Several versions of one mod
+### Several versions of one mod
 
 All installed versions of a mod share **one card**. Click the drop-down arrow on its version label
 and pick a version: it is switched on in the **viewed profile** and the others are switched off, so
@@ -263,7 +263,7 @@ the viewed profile points such a mod at a *different* version, BetterMods says s
 It appears only in that case - never after a fresh launch, for a mod that is switched off, for
 content-only mods, or for simply enabling or disabling mods.
 
-## Update checking
+### Update checking
 
 BetterMods checks your installed mods against the official mod DB (**mods.vintagestory.at**) in the
 background: once per session, the first time you open the Mods screen or the in-game dialog, and
@@ -303,7 +303,7 @@ menu:
 
 If an install fails, the status line says why and the card's tooltip keeps the reason.
 
-## Open mod page and trusted links
+### Open mod page and trusted links
 
 BECUASE I DON'T WANT TO HIT CONFIRM EVERY TIME 
 
@@ -315,7 +315,7 @@ To undo "Always trust", close the game and remove the site from the `"TrustedLin
 `%APPDATA%\VintagestoryData\ModConfig\bettermods.json` (or remove the whole entry). There is no
 in-game switch for this.
 
-## Fix dependencies
+### Fix dependencies
 
 When a mod that is **switched on in the viewed profile** has a dependency that is missing, switched
 off or too old, its card gets a yellow **Fix dependencies** button and the tooltip lists each
@@ -339,7 +339,7 @@ It does **not** fix requirements on the game itself (`game`, `survival`, `creati
 mods). Those are shown in the tooltip - for example "this game provides 1.23.0-pre.1 (cannot be
 fixed here)", or a core mod switched off in this profile - and left to you.
 
-## Core-mod protection
+### Core-mod protection
 
 Switching off a core mod (`game`, `survival`, `creative` and the like) asks for confirmation first,
 with the game's own warning - on the Mods screen and in the in-game dialog alike. Switching one back
@@ -410,8 +410,9 @@ On **Create New World**, the **Select A Playstyle** row gets two buttons at its 
   lists the same without it, and the world list shows the base playstyle's name.
 - **Missing pieces.** If the base playstyle is not installed (its mod is disabled or removed), the
   entry stays in the list, greyed out, tagged *Unavailable* with the reason, and cannot be picked.
-  Settings for mods that are not installed are skipped, and the row says so ("2 settings ignored:
-  mod X not installed").
+  That is the only thing that blocks an entry. Settings it cannot use - for mods that are not
+  installed, ones no installed mod defines, or invalid values - are skipped and the entry still
+  loads; hover it to see what was skipped ("2 settings ignored: mod X not installed").
 
 Like everything on the main menu, the buttons need a world loaded once or the
 [startup hook](#loading-at-startup-the-startup-hook).
@@ -429,29 +430,30 @@ Any mod (or player) can add playstyles to that list by writing files into one fo
 ```json
 {
   "format": "vsplaystyle",
-  "formatVersion": 1,
   "name": "Hardcore Survival",
   "description": "Survive and Build with one life and harsh winters.",
   "basePlaystyle": "surviveandbuild",
   "worldHeight": 320,
   "worldConfig": { "playerlives": "1", "harshWinters": "true", "graceTimer": "0" },
   "readOnly": false,
-  "author": "",
-  "createdBy": "bettermods 1.x",
-  "gameVersion": "1.23.0-pre.1"
+  "author": ""
 }
 ```
 
 | Field | Meaning |
 |---|---|
-| `format`, `formatVersion` | Required: `"vsplaystyle"`, `1`. A higher version is skipped (logged). |
+| `format` | Optional type marker, `"vsplaystyle"`. BetterMods writes it but never checks it - the `.vsplaystyle` extension is what counts. |
 | `name`, `description` | Shown in the list. ASCII; up to 60 and 200 characters. |
 | `basePlaystyle` | Required. Code of a real playstyle (`surviveandbuild`, `exploration`, `wildernesssurvival`, `creativebuilding`, or one a mod defines). The world is created as this playstyle. |
 | `worldHeight` | Optional, default 256. Rounded to the Customize slider: 128-512 in steps of 64 (128-2048 for `creativebuilding`). |
 | `worldConfig` | Sparse overrides on top of the base playstyle, keyed by world-config attribute code - the same keys and values as a `worldconfig.json` playstyle. Strings, numbers or booleans. |
 | `settingMods` | Optional: attribute code -> mod id. Only used to explain skipped keys ("mod X not installed"). BetterMods writes it. |
 | `readOnly` | `true` for files your mod supplies: BetterMods never deletes or overwrites them, and Delete is disabled for them. |
-| `author`, `createdBy`, `gameVersion` | Informational. A read-only file's tag is `By <author>`, or "From a mod" when `author` is empty. |
+| `author` | Informational. A read-only file's tag is `By <author>`, or "From a mod" when `author` is empty. |
+
+There is **no version number** to match. Any other field - including the `formatVersion`,
+`gameVersion` and `createdBy` that older BetterMods versions wrote - is ignored, so those files keep
+loading unchanged.
 
 Effective settings: every attribute's default, overridden by the base playstyle's `worldConfig`,
 overridden by the file's `worldConfig`.
@@ -460,12 +462,14 @@ overridden by the file's `worldConfig`.
 plain JSON with no type handling.
 
 - At most 200 files of at most 64 KB each are read.
-- A file that is not valid JSON, has the wrong `format`, a newer `formatVersion`, no usable
-  `basePlaystyle` or a bad file name is skipped and logged.
+- A file that is not valid JSON, has no `basePlaystyle` (or names another saved playstyle as its
+  base) or has a bad file name is skipped and logged. Nothing else keeps a file out of the list.
+- A `basePlaystyle` that is not installed lists the entry as *Unavailable* with the reason.
 - Each `worldConfig` value is checked against the attribute's own data type: numbers are clamped to
   its min/max, a dropdown value must be one of its allowed values, and text may not contain `<` or
-  `>`. A rejected value keeps the base playstyle's value, and the row says how many were rejected.
-  Keys no installed mod defines are skipped.
+  `>`. A rejected value keeps the base playstyle's value. Keys no installed mod defines, and values
+  that are not a string, number or boolean, are skipped. **The entry still loads either way**: its
+  tooltip says how many settings were skipped, and the log names each one.
 - Two files whose names differ only in case both load; the later one's code gets `-2`.
 
 ## Multiplayer

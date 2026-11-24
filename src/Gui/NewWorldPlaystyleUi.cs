@@ -322,8 +322,8 @@ namespace BetterMods.Gui
                         lines.Add("Based on " + BaseTitle(custom) + ", world height " + custom.WorldHeight + ".");
                     }
 
-                    if (custom.Notes != null) lines.Add(custom.Notes);
-
+                    // Skipped settings are NOT listed here - they go to the tooltip (AppendTooltipNotes)
+                    // and the log, so a preset with a few unsupported settings looks like any other.
                     cell.DetailText = string.Join("\n", lines);
                 }
                 catch (Exception e)
@@ -359,6 +359,31 @@ namespace BetterMods.Gui
             catch (Exception e)
             {
                 BetterModsModSystem.Logger?.Warning("[BetterMods] Could not label the custom playstyles in the dropdown: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// A custom entry's hover tooltip: vanilla's <c>WorldConfig.ToRichText</c> text (the only thing
+        /// that fills the new-world rows' tooltips, from <c>InitGui</c> and <c>OnClickCellLeft</c>) plus
+        /// one dimmed line saying which settings were skipped. Called from the <c>ToRichText</c>
+        /// postfix; leaves <paramref name="text"/> unchanged for anything but a custom entry with notes.
+        /// </summary>
+        public static void AppendTooltipNotes(PlayStyle playstyle, ref string text)
+        {
+            try
+            {
+                if (!PlaystyleFormat.IsCustomCode(playstyle?.Code)) return;
+
+                CustomPlaystyles.BuiltPlaystyle custom = CustomPlaystyles.Find(playstyle.Code);
+                if (custom?.Notes == null) return;
+
+                string notes = Updates.ModUpdateRules.AsciiLine(custom.Notes, 600).Replace("<", "&lt;").Replace(">", "&gt;");
+                string line = "<font opacity=\"0.6\">Skipped: " + notes + "</font>";
+                text = string.IsNullOrEmpty(text) ? line : text.TrimEnd('\r', '\n') + "\n" + line;
+            }
+            catch (Exception e)
+            {
+                BetterModsModSystem.Logger?.Warning("[BetterMods] Could not add the playstyle notes to its tooltip: " + e.Message);
             }
         }
 

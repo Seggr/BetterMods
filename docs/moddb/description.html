@@ -38,6 +38,58 @@
 <li style="margin:6px 0"><strong>Restart only for a version swap</strong> - enabling and disabling mods never needs one.</li>
 </ul>
 
+<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Load at startup (the startup hook)</h2>
+<p style="line-height:1.6;margin:8px 0">Why this is needed: see <strong>Why is this a hack?</strong> above.</p>
+<div style="background:#eef5ff;border:1px solid #b9cde8;border-left:5px solid #5b84b8;border-radius:8px;padding:12px 16px;margin:12px 0 14px 0">
+<p style="line-height:1.6;margin:0 0 8px 0"><strong>The easy way: Add Shortcut (Windows)</strong></p>
+<ol style="line-height:1.6;padding-left:22px;margin:0">
+<li style="margin:6px 0">Load any world once with BetterMods installed (the button is also in the in-game dialog).</li>
+<li style="margin:6px 0">On <strong>BetterMods' own card</strong>, click <strong>Add Shortcut</strong>.</li>
+<li style="margin-bottom:0">From now on, start the game from the desktop shortcut <strong>Vintage Story (BetterMods)</strong>.</li>
+</ol>
+</div>
+<div style="margin:14px 0;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="SCREENSHOT_URL_7" alt="BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists</div></div>
+<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
+<li style="margin:6px 0"><strong>For that launch only:</strong> the shortcut sets <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> just for the game it starts, and only if the hook file exists - delete the file and it still starts a normal game.</li>
+<li style="margin:6px 0"><strong>Nothing to copy by hand:</strong> BetterMods writes the hook to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\BetterMods\BetterModsHook.dll</code> and keeps it matching the installed version, even after updates.</li>
+<li style="margin:6px 0">The button greys out once the shortcut exists. Starting the game any other way gives the normal behaviour.</li>
+<li style="margin:6px 0"><strong>Off means off:</strong> switch BetterMods off in the mod manager and the hook does nothing either, from the next launch.</li>
+</ul>
+
+<div style="background:#fff4ec;border:1px solid #efc9b4;border-left:5px solid #c2562f;border-radius:8px;padding:12px 16px;margin:14px 0">
+<p style="line-height:1.6;margin:0 0 8px 0"><strong>Never set <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> globally.</strong> If it points at a file that is missing or not a valid startup hook, <strong>the game does not start at all</strong> - no error dialog, no log.</p>
+<ul style="line-height:1.6;padding-left:22px;margin:0">
+<li style="margin:6px 0">Do <strong>not</strong> set it machine-wide or per-user (<code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">setx</code> or the system settings) - every .NET program would try to load it.</li>
+<li style="margin-bottom:0">Do <strong>not</strong> edit <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintagestory.runtimeconfig.json</code> - a bad path there stops the game launching, and every game update overwrites the file.</li>
+</ul>
+</div>
+
+<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Making the Windows shortcut by hand</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+<p>Right-click the desktop, <strong>New &gt; Shortcut</strong>, then in its Properties set:</p>
+<table style="border-collapse:collapse;width:100%;margin:10px 0">
+<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece;width:90px"><strong>Target</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7;background:#fffdf8;word-break:break-all"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%SystemRoot%\System32\cmd.exe /c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td></tr>
+<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Start in</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code></td></tr>
+<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Run</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7">Minimized</td></tr>
+<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Icon</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER\Vintagestory.exe</code></td></tr>
+</table>
+<p>Replace <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code> with your install folder (installer default: <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for both hook paths and add <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
+<p>If the Target box cuts the line off (about 260 characters), save this as <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintage Story (BetterMods).cmd</code> and launch from it instead:</p>
+<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">@echo off
+set "HOOK=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll"
+if exist "%HOOK%" set "DOTNET_STARTUP_HOOKS=%HOOK%"
+start "" "GAMEFOLDER\Vintagestory.exe"</pre>
+</div></div>
+
+<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Linux and macOS</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+<p>No shortcut is made. The greyed-out Add Shortcut button's tooltip shows the exact command for your install, and the same line is written once to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">client-main.log</code>:</p>
+<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">DOTNET_STARTUP_HOOKS='&lt;data folder&gt;/ModConfig/BetterMods/BetterModsHook.dll' '&lt;game folder&gt;/Vintagestory'</pre>
+<p>To keep the game launchable if the hook file is ever missing, use a script that sets the variable only when the file is there (Linux data folder is normally <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">~/.config/VintagestoryData</code>):</p>
+<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">#!/bin/sh
+HOOK="$HOME/.config/VintagestoryData/ModConfig/BetterMods/BetterModsHook.dll"
+if [ -f "$HOOK" ]; then export DOTNET_STARTUP_HOOKS="$HOOK"; fi
+exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
+</div></div>
+
 <div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Profiles</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
 <p>A profile is a named list of which mods are on and which are off. <strong>Profile 1</strong> is created from whatever was enabled when BetterMods first ran, so nothing changes until you change it.</p>
 <div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="SCREENSHOT_URL_2" alt="Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels</div></div>
@@ -135,83 +187,28 @@
 <li style="margin:6px 0">Saved playstyles appear in the list tagged <strong>Custom</strong> with a line like "Based on Standard, world height 256.". Picking one applies all its settings and its height.</li>
 <li style="margin:6px 0"><strong>Delete playstyle</strong> asks first, and is disabled for the game's own playstyles, ones mods define in <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">worldconfig.json</code>, and files a mod marked read-only.</li>
 <li style="margin:6px 0"><strong>Worlds stay vanilla:</strong> a world is created as the base playstyle with the saved settings applied, and loads the same without BetterMods.</li>
-<li style="margin:6px 0">A missing base playstyle greys the entry out as <strong>Unavailable</strong>; settings for missing mods are skipped and the row says so.</li>
+<li style="margin:6px 0">A missing base playstyle greys the entry out as <strong>Unavailable</strong> - the only thing that blocks an entry. Settings it cannot use (missing mods, unknown keys, invalid values) are skipped and the entry still loads; hover it to see what was skipped.</li>
 </ul>
 
 <div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">For mod authors: the .vsplaystyle format</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
 <p>Any mod (or player) can add playstyles by writing <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;name&gt;.vsplaystyle</code> files (UTF-8 JSON, name from <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">A-Z a-z 0-9 _ -</code>, 1-128 characters) directly into <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;data path&gt;\Playstyles\</code> - exactly what <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">api.GetOrCreateDataPath("Playstyles")</code> returns.</p>
 <pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">{
   "format": "vsplaystyle",
-  "formatVersion": 1,
   "name": "Hardcore Survival",
   "description": "Survive and Build with one life and harsh winters.",
   "basePlaystyle": "surviveandbuild",
   "worldHeight": 320,
   "worldConfig": { "playerlives": "1", "harshWinters": "true", "graceTimer": "0" },
   "readOnly": true,
-  "author": "YourMod",
-  "createdBy": "yourmod 1.0",
-  "gameVersion": "1.23.0-pre.1"
+  "author": "YourMod"
 }</pre>
 <ul>
-<li style="margin:6px 0"><strong>format</strong>, <strong>formatVersion</strong> (required): "vsplaystyle", 1. A higher version is skipped.</li>
+<li style="margin:6px 0"><strong>format</strong> (optional): "vsplaystyle" - a type marker, never checked; the .vsplaystyle extension is what counts. There is <strong>no version number</strong>: unknown fields are ignored, including the formatVersion, gameVersion and createdBy older files carry, so those keep loading.</li>
 <li style="margin:6px 0"><strong>basePlaystyle</strong> (required): a real playstyle code; the world is created as it. <strong>worldConfig</strong>: sparse overrides keyed by world-config attribute code, as in a <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">worldconfig.json</code> playstyle.</li>
 <li style="margin:6px 0"><strong>worldHeight</strong> (default 256): rounded to 128-512 in steps of 64 (to 2048 for creativebuilding).</li>
 <li style="margin:6px 0"><strong>readOnly: true</strong> for files your mod supplies - never deleted or overwritten, tagged "By &lt;author&gt;" (or "From a mod").</li>
-<li style="margin:6px 0"><strong>Data only:</strong> plain JSON, nothing executed; at most 200 files of 64 KB. Bad files are skipped and logged. Each value is checked against its attribute (ranges clamped, dropdowns must match, no &lt; or &gt; in text); a rejected value keeps the base value.</li>
+<li style="margin:6px 0"><strong>Data only:</strong> plain JSON, nothing executed; at most 200 files of 64 KB. Only a file that is not JSON, has no basePlaystyle or has a bad name is skipped (and logged); a basePlaystyle that is not installed shows the entry as Unavailable. Each value is checked against its attribute (ranges clamped, dropdowns must match, no &lt; or &gt; in text); a rejected value keeps the base value and unknown keys are skipped - <strong>the entry still loads</strong>, and its tooltip and the log say what was skipped.</li>
 </ul>
-</div></div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Load at startup (the startup hook)</h2>
-<p style="line-height:1.6;margin:8px 0">Why this is needed: see <strong>Why is this a hack?</strong> above.</p>
-<div style="background:#eef5ff;border:1px solid #b9cde8;border-left:5px solid #5b84b8;border-radius:8px;padding:12px 16px;margin:12px 0 14px 0">
-<p style="line-height:1.6;margin:0 0 8px 0"><strong>The easy way: Add Shortcut (Windows)</strong></p>
-<ol style="line-height:1.6;padding-left:22px;margin:0">
-<li style="margin:6px 0">Load any world once with BetterMods installed (the button is also in the in-game dialog).</li>
-<li style="margin:6px 0">On <strong>BetterMods' own card</strong>, click <strong>Add Shortcut</strong>.</li>
-<li style="margin-bottom:0">From now on, start the game from the desktop shortcut <strong>Vintage Story (BetterMods)</strong>.</li>
-</ol>
-</div>
-<div style="margin:14px 0;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="SCREENSHOT_URL_7" alt="BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists</div></div>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>For that launch only:</strong> the shortcut sets <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> just for the game it starts, and only if the hook file exists - delete the file and it still starts a normal game.</li>
-<li style="margin:6px 0"><strong>Nothing to copy by hand:</strong> BetterMods writes the hook to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\BetterMods\BetterModsHook.dll</code> and keeps it matching the installed version, even after updates.</li>
-<li style="margin:6px 0">The button greys out once the shortcut exists. Starting the game any other way gives the normal behaviour.</li>
-<li style="margin:6px 0"><strong>Off means off:</strong> switch BetterMods off in the mod manager and the hook does nothing either, from the next launch.</li>
-</ul>
-
-<div style="background:#fff4ec;border:1px solid #efc9b4;border-left:5px solid #c2562f;border-radius:8px;padding:12px 16px;margin:14px 0">
-<p style="line-height:1.6;margin:0 0 8px 0"><strong>Never set <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> globally.</strong> If it points at a file that is missing or not a valid startup hook, <strong>the game does not start at all</strong> - no error dialog, no log.</p>
-<ul style="line-height:1.6;padding-left:22px;margin:0">
-<li style="margin:6px 0">Do <strong>not</strong> set it machine-wide or per-user (<code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">setx</code> or the system settings) - every .NET program would try to load it.</li>
-<li style="margin-bottom:0">Do <strong>not</strong> edit <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintagestory.runtimeconfig.json</code> - a bad path there stops the game launching, and every game update overwrites the file.</li>
-</ul>
-</div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Making the Windows shortcut by hand</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p>Right-click the desktop, <strong>New &gt; Shortcut</strong>, then in its Properties set:</p>
-<table style="border-collapse:collapse;width:100%;margin:10px 0">
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece;width:90px"><strong>Target</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7;background:#fffdf8;word-break:break-all"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%SystemRoot%\System32\cmd.exe /c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Start in</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code></td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Run</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7">Minimized</td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Icon</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER\Vintagestory.exe</code></td></tr>
-</table>
-<p>Replace <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code> with your install folder (installer default: <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for both hook paths and add <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
-<p>If the Target box cuts the line off (about 260 characters), save this as <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintage Story (BetterMods).cmd</code> and launch from it instead:</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">@echo off
-set "HOOK=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll"
-if exist "%HOOK%" set "DOTNET_STARTUP_HOOKS=%HOOK%"
-start "" "GAMEFOLDER\Vintagestory.exe"</pre>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Linux and macOS</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p>No shortcut is made. The greyed-out Add Shortcut button's tooltip shows the exact command for your install, and the same line is written once to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">client-main.log</code>:</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">DOTNET_STARTUP_HOOKS='&lt;data folder&gt;/ModConfig/BetterMods/BetterModsHook.dll' '&lt;game folder&gt;/Vintagestory'</pre>
-<p>To keep the game launchable if the hook file is ever missing, use a script that sets the variable only when the file is there (Linux data folder is normally <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">~/.config/VintagestoryData</code>):</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">#!/bin/sh
-HOOK="$HOME/.config/VintagestoryData/ModConfig/BetterMods/BetterModsHook.dll"
-if [ -f "$HOOK" ]; then export DOTNET_STARTUP_HOOKS="$HOOK"; fi
-exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 </div></div>
 
 <h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Safety</h2>

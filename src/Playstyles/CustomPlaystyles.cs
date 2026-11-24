@@ -53,6 +53,14 @@ namespace BetterMods.Playstyles
         private static MethodBase initGuiMethod;
         private static bool armedWarningLogged;
 
+        /// <summary>
+        /// "path|what was skipped" lines already written to the log. <see cref="Build"/> runs on every
+        /// list load (each screen rebuild, each clone), so each distinct message is logged once a session.
+        /// </summary>
+        private static readonly HashSet<string> loggedSkips = new HashSet<string>(StringComparer.Ordinal);
+
+        private const int MaxLoggedKeys = 12;
+
         /// <summary>A custom playstyle as built against the installed mods.</summary>
         public sealed class BuiltPlaystyle
         {
@@ -64,7 +72,11 @@ namespace BetterMods.Playstyles
             public bool Usable;
             public string UnusableReason;
 
-            /// <summary>"2 settings ignored: mod X not installed" and the like; null when there is nothing to say.</summary>
+            /// <summary>
+            /// "2 settings ignored: mod X not installed" and the like; null when there is nothing to say.
+            /// Plain text (not VTML). Shown only in the entry's tooltip and the log - never on the row,
+            /// and never a reason to make the entry unusable.
+            /// </summary>
             public string Notes;
 
             public int WorldHeight;
@@ -335,7 +347,13 @@ namespace BetterMods.Playstyles
 
             JObject merged = basePlaystyle?.WorldConfig?.Token is JObject baseConfig ? (JObject)baseConfig.DeepClone() : new JObject();
 
+            // Settings this install cannot honour are skipped and the entry still loads: a key no
+            // installed mod defines, a value of the wrong type, an out-of-list dropdown value. Ranges
+            // are clamped by TryCanonical. Only a missing base (below) makes an entry unusable.
             Dictionary<string, int> ignoredByMod = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            List<string> unknownKeys = new List<string>();
+            List<string> invalidKeys = new List<string>();
+            List<string> missingModKeys = new List<string>();
             int unknown = 0;
             int invalid = file.RejectedKeys;
 
@@ -347,10 +365,12 @@ namespace BetterMods.Playstyles
                     {
                         ignoredByMod.TryGetValue(modId, out int count);
                         ignoredByMod[modId] = count + 1;
+                        missingModKeys.Add(entry.Key + " (" + modId + ")");
                     }
                     else
                     {
                         unknown++;
+                        unknownKeys.Add(entry.Key);
                     }
 
                     continue;
@@ -363,6 +383,7 @@ namespace BetterMods.Playstyles
                 else
                 {
                     invalid++;
+                    invalidKeys.Add(entry.Key);
                 }
             }
 
@@ -398,6 +419,8 @@ namespace BetterMods.Playstyles
                 }
             };
 
+            if (result.Notes != null) LogSkips(file, missingModKeys, unknownKeys, invalidKeys);
+
             if (basePlaystyle != null)
             {
                 remapTargets[file.Code] = new RealPlaystyle
@@ -414,6 +437,41 @@ namespace BetterMods.Playstyles
         private static string Plural(int count, string noun)
         {
             return count + " " + noun + (count == 1 ? "" : "s");
+        }
+
+        /// <summary>
+        /// One log line per file naming the settings that were skipped (keys, capped), written once a
+        /// session per distinct message. The entry itself still loads; this is information only.
+        /// </summary>
+        private static void LogSkips(PlaystyleFile file, List<string> missingModKeys, List<string> unknownKeys, List<string> invalidKeys)
+        {
+            try
+            {
+                List<string> parts = new List<string>();
+                if (missingModKeys.Count > 0) parts.Add("for mods that are not installed: " + KeyList(missingModKeys));
+                if (unknownKeys.Count > 0) parts.Add("no installed mod defines: " + KeyList(unknownKeys));
+                if (invalidKeys.Count > 0) parts.Add("invalid value, base value kept: " + KeyList(invalidKeys));
+
+                int dropped = file.RejectedKeys;
+                if (dropped > 0) parts.Add(Plural(dropped, "entry") + " not readable as a setting (bad key, non-text value or over the limit)");
+
+                if (parts.Count == 0) return;
+
+                string message = "[BetterMods] Playstyle file " + System.IO.Path.GetFileName(file.Path ?? file.Slug ?? "") +
+                                 " loaded; skipped settings - " + string.Join("; ", parts) + ".";
+
+                if (loggedSkips.Add((file.Path ?? file.Slug) + "|" + message)) BetterModsModSystem.Logger?.Notification(message);
+            }
+            catch (Exception)
+            {
+                // Logging only.
+            }
+        }
+
+        private static string KeyList(List<string> keys)
+        {
+            string list = string.Join(", ", keys.Take(MaxLoggedKeys));
+            return keys.Count > MaxLoggedKeys ? list + " and " + (keys.Count - MaxLoggedKeys) + " more" : list;
         }
 
         /// <summary>An attribute an installed mod defines, and that mod's id.</summary>
@@ -531,7 +589,6 @@ namespace BetterMods.Playstyles
             public int WorldHeight;
             public Dictionary<string, string> Overrides = new Dictionary<string, string>(StringComparer.Ordinal);
             public Dictionary<string, string> SettingMods = new Dictionary<string, string>(StringComparer.Ordinal);
-            public string CreatedBy;
 
             /// <summary>The current entry when it is itself a custom preset (prefills the name).</summary>
             public BuiltPlaystyle From;
@@ -612,9 +669,6 @@ namespace BetterMods.Playstyles
             }
 
             capture.WorldHeight = PlaystyleFormat.EffectiveWorldHeight(config.MapsizeY, capture.BaseCode);
-
-            string version = config.mods?.FirstOrDefault(m => m?.Info?.ModID == BetterModsModSystem.ModId)?.Info?.Version;
-            capture.CreatedBy = "bettermods" + (string.IsNullOrEmpty(version) ? "" : " " + version);
 
             return capture;
         }
@@ -724,9 +778,7 @@ namespace BetterMods.Playstyles
                     BaseCode = capture.BaseCode,
                     WorldHeight = capture.WorldHeight,
                     ReadOnly = false,
-                    Author = "",
-                    CreatedBy = capture.CreatedBy,
-                    GameVersion = GameVersion.ShortGameVersion
+                    Author = ""
                 };
 
                 foreach (KeyValuePair<string, string> entry in capture.Overrides) file.Overrides.Add(entry);
