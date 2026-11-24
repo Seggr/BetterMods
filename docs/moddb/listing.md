@@ -98,3 +98,16 @@ around it (no upscaling).
    back to the normal view to check that the images load. The spoilers save collapsed, which is
    intended. Never paste an image as a `data:` URI - it counts against the 65,535-byte limit.
 5. Fill in the **Summary** (one of the options above) and the link fields, then **Save**.
+6. Open the public page and check: the callout box at the top, every image showing, each spoiler
+   opening, and the code blocks readable.
+
+Notes for later edits:
+
+- The editor strips `<script>`, `<style>` blocks, `<link>`, forms, `on*` attributes and most embeds.
+  Keep styling inline, as the file does.
+- **Do not add HTML comments** - the site turns them into visible text.
+- The file is about 48 KB (most of it inline styling); the hard limit is 65,535 bytes. Keep
+  additions modest.
+- If the editor rewrites something on save, edit `description.html` here to match so the next paste
+  does not undo it.
+- Images are loaded from `raw.githubusercontent.com` on `main`; keep the files there.
