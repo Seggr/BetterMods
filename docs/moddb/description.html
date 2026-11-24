@@ -1,198 +1,263 @@
-<p style="font-size:1.15em;line-height:1.6;margin:0 0 14px 0"><strong>Mod profiles for Vintage Story's mod manager + custom "Playstyles".</strong> Keep named sets of enabled and disabled mods, switch between them with one click, pick which installed version of a mod each profile uses, and update your mods from the mod DB - all inside the game's own Mods screen.</p>
-
-<div style="display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px 0">
-<div style="flex:1 1 180px;padding:10px 14px;border:1px solid #d7cfbf;border-radius:10px;background:#faf7f0"><strong>Client-side only</strong><br><span style="font-size:0.9em;color:#7a6f5f">works on any server</span></div>
-<div style="flex:1 1 180px;padding:10px 14px;border:1px solid #d7cfbf;border-radius:10px;background:#faf7f0"><strong>Vintage Story 1.23.0-pre.1+</strong><br><span style="font-size:0.9em;color:#7a6f5f">1.22: use BetterMods 1.2.0</span></div>
-<div style="flex:1 1 180px;padding:10px 14px;border:1px solid #d7cfbf;border-radius:10px;background:#faf7f0"><strong>Main menu: Mods</strong><br><span style="font-size:0.9em;color:#7a6f5f">profile tabs above the list</span></div>
-<div style="flex:1 1 180px;padding:10px 14px;border:1px solid #d7cfbf;border-radius:10px;background:#faf7f0"><strong>In game: Mod Profiles</strong><br><span style="font-size:0.9em;color:#7a6f5f">bind a key in Settings &gt; Controls</span></div>
+<p style="font-size: 1.15em; line-height: 1.6; margin: 0 0 14px 0;"><strong>Mod profiles for Vintage Story's mod manager + custom "Playstyles".</strong> Keep named sets of enabled and disabled mods, switch between them with one click, pick which installed version of a mod each profile uses, and update your mods from the mod DB - all inside the game's own Mods screen.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 18px 0;">
+<div style="flex: 1 1 180px; padding: 10px 14px; border: 1px solid #d7cfbf; border-radius: 10px; background: #faf7f0;"><strong>Client-side only</strong><br /><span style="font-size: 0.9em; color: #7a6f5f;">works on any server</span></div>
+<div style="flex: 1 1 180px; padding: 10px 14px; border: 1px solid #d7cfbf; border-radius: 10px; background: #faf7f0;"><strong>Vintage Story 1.23.0-pre.1+</strong><br /><span style="font-size: 0.9em; color: #7a6f5f;">1.22: use BetterMods 1.2.0</span></div>
+<div style="flex: 1 1 180px; padding: 10px 14px; border: 1px solid #d7cfbf; border-radius: 10px; background: #faf7f0;"><strong>Main menu: Mods</strong><br /><span style="font-size: 0.9em; color: #7a6f5f;">profile tabs above the list</span></div>
+<div style="flex: 1 1 180px; padding: 10px 14px; border: 1px solid #d7cfbf; border-radius: 10px; background: #faf7f0;"><strong>In game: Mod Profiles</strong><br /><span style="font-size: 0.9em; color: #7a6f5f;">bind a key in Settings &gt; Controls</span></div>
 </div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Lets be clear this is a filthy Hack of a mod</h2>
-<p style="line-height:1.6;margin:8px 0">This mod introduces features I believe should be stock in the game and I hope the developers look at this and say "oh yes he is correct this is how it should be" and then impliment everything it does, they don't even need to say thank you, I'll know ;3</p>
-<div style="background:#eef5ff;border:1px solid #b9cde8;border-left:5px solid #5b84b8;border-radius:8px;padding:12px 16px;margin:12px 0 14px 0">
-<h3 style="margin:0 0 8px 0;font-size:1.1em;color:#3a342c">Why is this a hack? becauase it requires abusing .net to do what I want</h3>
-<p style="line-height:1.6;margin:0 0 8px 0">Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on a normal launch the Mods screen stays vanilla until you have loaded a world once that session.</p>
-<p style="line-height:1.6;margin:0 0 8px 0">The fix is a small <strong>.NET startup hook</strong>, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">BetterModsHook.dll</code>, which the .NET runtime itself runs before the game starts. It waits for the game to finish starting, then loads BetterMods' patches, so the profile tabs are there from the very first screen. It does nothing else, and it changes nothing once a world is loaded.</p>
-<p style="line-height:1.6;margin:0">The catch: .NET only runs a startup hook when the <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> environment variable names it, and a mod has no way to set that for the game. So BetterMods makes a <strong>custom desktop shortcut</strong>, <em>Vintage Story (BetterMods)</em>, from the <strong>Add Shortcut</strong> button on its own mod card. The shortcut sets that variable for that one launch only - and only if the hook file is actually there - then starts the game. Launch from the shortcut and the hook runs; launch the game normally and everything stays vanilla until a world loads. Nothing on your system is changed globally.</p>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Lets be clear: this is a filthy Hack of a mod</h2>
+<p style="line-height: 1.6; margin: 8px 0;">This mod introduces features I believe should be stock in the game, and I hope the developers look at this and say "oh yes, he is correct; this is how it should be" and then implement everything it does. They don't even need to say thank you, I'll know ;3</p>
+<div style="background: #eef5ff; border: 1px solid #b9cde8; border-left: 5px solid #5b84b8; border-radius: 8px; padding: 12px 16px; margin: 12px 0 14px 0;">
+<h3 style="margin: 0 0 8px 0; font-size: 1.1em; color: #3a342c;">Why is this a hack? Because it requires abusing .net to do what I want</h3>
+<p style="line-height: 1.6; margin: 0 0 8px 0;">Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on a normal launch the Mods screen stays vanilla until you have loaded a world once that session.</p>
+<p style="line-height: 1.6; margin: 0 0 8px 0;">The fix is a small <strong>.NET startup hook</strong>, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">BetterModsHook.dll</code>, which the .NET runtime itself runs before the game starts. It waits for the game to finish starting, then loads BetterMods' patches, so the profile tabs are there from the very first screen. It does nothing else, and it changes nothing once a world is loaded.</p>
+<p style="line-height: 1.6; margin: 0;">The catch: .NET only runs a startup hook when the <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> environment variable names it, and a mod has no way to set that for the game. So BetterMods makes a <strong>custom desktop shortcut</strong>, <em>Vintage Story (BetterMods)</em>, from the <strong>Add Shortcut</strong> button on its own mod card. The shortcut sets that variable for that one launch only - and only if the hook file is actually there - then starts the game. Launch from the shortcut and the hook runs; launch the game normally and everything stays vanilla until a world loads. Nothing on your system is changed globally.</p>
 </div>
-
-<div style="margin:16px 0;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/01-mods-screen.png" alt="Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile</div></div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Installing</h2>
-<ol style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0">Download the zip from the <strong>Files</strong> tab (1.23: the latest; 1.22: BetterMods 1.2.0).</li>
-<li style="margin:6px 0">Drop it into your Mods folder <strong>without unzipping</strong> (Windows: <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%APPDATA%\VintagestoryData\Mods\</code> - the <strong>Open Mods Folder</strong> button gets you there).</li>
-<li style="margin:6px 0">Start the game and load any world once. Then, on <strong>BetterMods' own card</strong> in the mod list, click <strong>Add Shortcut</strong> and start the game from that shortcut from now on, so the tabs are there from the first screen (see <strong>Load at startup</strong> below).</li>
-<li style="margin:6px 0">For the in-game dialog, bind a key to <strong>Mod Profiles</strong> under <strong>Settings &gt; Controls</strong> (none by default).</li>
+<div style="margin: 16px 0; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/01-mods-screen.png" alt="Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile</div>
+</div>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Installing</h2>
+<ol style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;">Download the zip from the <strong>Files</strong> tab (1.23: the latest; 1.22: BetterMods 1.2.0).</li>
+<li style="margin: 6px 0;">Drop it into your Mods folder <strong>without unzipping</strong> (Windows: <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\VintagestoryData\Mods\</code> - the <strong>Open Mods Folder</strong> button gets you there).</li>
+<li style="margin: 6px 0;">Start the game and load any world once. Then, on <strong>BetterMods' own card</strong> in the mod list, click <strong>Add Shortcut</strong> and start the game from that shortcut from now on, so the tabs are there from the first screen (see <strong>Load at startup</strong> below).</li>
+<li style="margin: 6px 0;">For the in-game dialog, bind a key to <strong>Mod Profiles</strong> under <strong>Settings &gt; Controls</strong> (none by default).</li>
 </ol>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Features</h2>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>Profiles as tabs</strong> - one per profile; <strong>+</strong> copies the one you are viewing, right-click to rename or delete. <strong>Apply Profile</strong> writes the game's own settings.</li>
-<li style="margin:6px 0"><strong>One card per mod</strong> - several installed versions share a card with a version drop-down; each profile can use a different version.</li>
-<li style="margin:6px 0"><strong>Update checking</strong> against mods.vintagestory.at, with <strong>Update all</strong> and a <strong>(Retracted)</strong> note.</li>
-<li style="margin:6px 0"><strong>Fix dependencies</strong> - switches on, or downloads, what a mod needs.</li>
-<li style="margin:6px 0"><strong>Singleplayer worlds remember their mods</strong> and offer the matching profile.</li>
-<li style="margin:6px 0"><strong>In-game dialog</strong> - the same tools without leaving the world.</li>
-<li style="margin:6px 0"><strong>Saved playstyles</strong> on Create New World.</li>
-<li style="margin:6px 0"><strong>Restart only for a version swap</strong> - enabling and disabling mods never needs one.</li>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Features</h2>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><strong>Profiles as tabs</strong> - one per profile; <strong>+</strong> copies the one you are viewing, right-click to rename or delete. <strong>Apply Profile</strong> writes the game's own settings.</li>
+<li style="margin: 6px 0;"><strong>One card per mod</strong> - several installed versions share a card with a version drop-down; each profile can use a different version.</li>
+<li style="margin: 6px 0;"><strong>Update checking</strong> against mods.vintagestory.at, with <strong>Update all</strong> and a <strong>(Retracted)</strong> note.</li>
+<li style="margin: 6px 0;"><strong>Fix dependencies</strong> - switches on, or downloads, what a mod needs.</li>
+<li style="margin: 6px 0;"><strong>Singleplayer worlds remember their mods</strong> and offer the matching profile.</li>
+<li style="margin: 6px 0;"><strong>In-game dialog</strong> - the same tools without leaving the world.</li>
+<li style="margin: 6px 0;"><strong>Saved playstyles</strong> on Create New World.</li>
+<li style="margin: 6px 0;"><strong>Restart only for a version swap</strong> - enabling and disabling mods never needs one.</li>
 </ul>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Load at startup (the startup hook)</h2>
-<p style="line-height:1.6;margin:8px 0">Why this is needed: see <strong>Why is this a hack?</strong> above.</p>
-<div style="background:#eef5ff;border:1px solid #b9cde8;border-left:5px solid #5b84b8;border-radius:8px;padding:12px 16px;margin:12px 0 14px 0">
-<p style="line-height:1.6;margin:0 0 8px 0"><strong>The easy way: Add Shortcut (Windows)</strong></p>
-<ol style="line-height:1.6;padding-left:22px;margin:0">
-<li style="margin:6px 0">Load any world once with BetterMods installed (the button is also in the in-game dialog).</li>
-<li style="margin:6px 0">On <strong>BetterMods' own card</strong>, click <strong>Add Shortcut</strong>.</li>
-<li style="margin-bottom:0">From now on, start the game from the desktop shortcut <strong>Vintage Story (BetterMods)</strong>.</li>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Load at startup (the startup hook)</h2>
+<p style="line-height: 1.6; margin: 8px 0;">Why this is needed: see <strong>Why is this a hack?</strong> above.</p>
+<div style="background: #eef5ff; border: 1px solid #b9cde8; border-left: 5px solid #5b84b8; border-radius: 8px; padding: 12px 16px; margin: 12px 0 14px 0;">
+<p style="line-height: 1.6; margin: 0 0 8px 0;"><strong>The easy way: Add Shortcut (Windows)</strong></p>
+<ol style="line-height: 1.6; padding-left: 22px; margin: 0;">
+<li style="margin: 6px 0;">Load any world once with BetterMods installed (the button is also in the in-game dialog).</li>
+<li style="margin: 6px 0;">On <strong>BetterMods' own card</strong>, click <strong>Add Shortcut</strong>.</li>
+<li style="margin-bottom: 0;">From now on, start the game from the desktop shortcut <strong>Vintage Story (BetterMods)</strong>.</li>
 </ol>
 </div>
-<div style="margin:14px 0;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/07-add-shortcut.png" alt="BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists</div></div>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>For that launch only:</strong> the shortcut sets <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> just for the game it starts, and only if the hook file exists - delete the file and it still starts a normal game.</li>
-<li style="margin:6px 0"><strong>Nothing to copy by hand:</strong> BetterMods writes the hook to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\BetterMods\BetterModsHook.dll</code> and keeps it matching the installed version, even after updates.</li>
-<li style="margin:6px 0">The button greys out once the shortcut exists. Starting the game any other way gives the normal behaviour.</li>
-<li style="margin:6px 0"><strong>Off means off:</strong> switch BetterMods off in the mod manager and the hook does nothing either, from the next launch.</li>
+<div style="margin: 14px 0; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/07-add-shortcut.png" alt="BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists</div>
+</div>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><strong>For that launch only:</strong> the shortcut sets <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> just for the game it starts, and only if the hook file exists - delete the file and it still starts a normal game.</li>
+<li style="margin: 6px 0;"><strong>Nothing to copy by hand:</strong> BetterMods writes the hook to <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\BetterMods\BetterModsHook.dll</code> and keeps it matching the installed version, even after updates.</li>
+<li style="margin: 6px 0;">The button greys out once the shortcut exists. Starting the game any other way gives the normal behaviour.</li>
+<li style="margin: 6px 0;"><strong>Off means off:</strong> switch BetterMods off in the mod manager and the hook does nothing either, from the next launch.</li>
 </ul>
-
-<div style="background:#fff4ec;border:1px solid #efc9b4;border-left:5px solid #c2562f;border-radius:8px;padding:12px 16px;margin:14px 0">
-<p style="line-height:1.6;margin:0 0 8px 0"><strong>Never set <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> globally.</strong> If it points at a file that is missing or not a valid startup hook, <strong>the game does not start at all</strong> - no error dialog, no log.</p>
-<ul style="line-height:1.6;padding-left:22px;margin:0">
-<li style="margin:6px 0">Do <strong>not</strong> set it machine-wide or per-user (<code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">setx</code> or the system settings) - every .NET program would try to load it.</li>
-<li style="margin-bottom:0">Do <strong>not</strong> edit <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintagestory.runtimeconfig.json</code> - a bad path there stops the game launching, and every game update overwrites the file.</li>
+<div style="background: #fff4ec; border: 1px solid #efc9b4; border-left: 5px solid #c2562f; border-radius: 8px; padding: 12px 16px; margin: 14px 0;">
+<p style="line-height: 1.6; margin: 0 0 8px 0;"><strong>Never set <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> globally.</strong> If it points at a file that is missing or not a valid startup hook, <strong>the game does not start at all</strong> - no error dialog, no log.</p>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 0;">
+<li style="margin: 6px 0;">Do <strong>not</strong> set it machine-wide or per-user (<code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">setx</code> or the system settings) - every .NET program would try to load it.</li>
+<li style="margin-bottom: 0;">Do <strong>not</strong> edit <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Vintagestory.runtimeconfig.json</code> - a bad path there stops the game launching, and every game update overwrites the file.</li>
 </ul>
 </div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Making the Windows shortcut by hand</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Making the Windows shortcut by hand</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <p>Right-click the desktop, <strong>New &gt; Shortcut</strong>, then in its Properties set:</p>
-<table style="border-collapse:collapse;width:100%;margin:10px 0">
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece;width:90px"><strong>Target</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7;background:#fffdf8;word-break:break-all"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%SystemRoot%\System32\cmd.exe /c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Start in</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code></td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Run</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7">Minimized</td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7;background:#e7dece"><strong>Icon</strong></td><td style="padding:7px 10px;border:1px solid #e1d8c7"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER\Vintagestory.exe</code></td></tr>
+<table style="border-collapse: collapse; width: 100%; margin: 10px 0;">
+<tbody>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece; width: 90px;"><strong>Target</strong></td>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7; background: #fffdf8; word-break: break-all;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%SystemRoot%\System32\cmd.exe /c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece;"><strong>Start in</strong></td>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">GAMEFOLDER</code></td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece;"><strong>Run</strong></td>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;">Minimized</td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece;"><strong>Icon</strong></td>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">GAMEFOLDER\Vintagestory.exe</code></td>
+</tr>
+</tbody>
 </table>
-<p>Replace <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">GAMEFOLDER</code> with your install folder (installer default: <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for both hook paths and add <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
-<p>If the Target box cuts the line off (about 260 characters), save this as <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Vintage Story (BetterMods).cmd</code> and launch from it instead:</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">@echo off
+<p>Replace <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">GAMEFOLDER</code> with your install folder (installer default: <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for both hook paths and add <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
+<p>If the Target box cuts the line off (about 260 characters), save this as <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Vintage Story (BetterMods).cmd</code> and launch from it instead:</p>
+<pre style="background: #f4efe4; border: 1px solid #e3d7bd; border-radius: 6px; padding: 10px 12px; overflow: auto; line-height: 1.45;">@echo off
 set "HOOK=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll"
 if exist "%HOOK%" set "DOTNET_STARTUP_HOOKS=%HOOK%"
 start "" "GAMEFOLDER\Vintagestory.exe"</pre>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Linux and macOS</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p>No shortcut is made. The greyed-out Add Shortcut button's tooltip shows the exact command for your install, and the same line is written once to <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">client-main.log</code>:</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">DOTNET_STARTUP_HOOKS='&lt;data folder&gt;/ModConfig/BetterMods/BetterModsHook.dll' '&lt;game folder&gt;/Vintagestory'</pre>
-<p>To keep the game launchable if the hook file is ever missing, use a script that sets the variable only when the file is there (Linux data folder is normally <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">~/.config/VintagestoryData</code>):</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">#!/bin/sh
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Linux and macOS</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<p>No shortcut is made. The greyed-out Add Shortcut button's tooltip shows the exact command for your install, and the same line is written once to <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">client-main.log</code>:</p>
+<pre style="background: #f4efe4; border: 1px solid #e3d7bd; border-radius: 6px; padding: 10px 12px; overflow: auto; line-height: 1.45;">DOTNET_STARTUP_HOOKS='&lt;data folder&gt;/ModConfig/BetterMods/BetterModsHook.dll' '&lt;game folder&gt;/Vintagestory'</pre>
+<p>To keep the game launchable if the hook file is ever missing, use a script that sets the variable only when the file is there (Linux data folder is normally <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">~/.config/VintagestoryData</code>):</p>
+<pre style="background: #f4efe4; border: 1px solid #e3d7bd; border-radius: 6px; padding: 10px 12px; overflow: auto; line-height: 1.45;">#!/bin/sh
 HOOK="$HOME/.config/VintagestoryData/ModConfig/BetterMods/BetterModsHook.dll"
 if [ -f "$HOOK" ]; then export DOTNET_STARTUP_HOOKS="$HOOK"; fi
 exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Profiles</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Profiles</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <p>A profile is a named list of which mods are on and which are off. <strong>Profile 1</strong> is created from whatever was enabled when BetterMods first ran, so nothing changes until you change it.</p>
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/02-rename-panel.png" alt="Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels</div></div>
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/02-rename-panel.png" alt="Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels</div>
+</div>
 <ul>
-<li style="margin:6px 0"><strong>Tabs:</strong> left-click to view and edit a profile. <strong>+</strong> creates "Profile N" as a copy of the one you are viewing. Right-click to rename (Enter saves, Esc cancels) or delete (second click confirms). The last profile cannot be deleted.</li>
-<li style="margin:6px 0"><strong>Viewed vs active:</strong> the selected tab is the one your clicks edit; the active profile is the one the game loads. The Mods screen always opens on the active one.</li>
-<li style="margin:6px 0"><strong>Toggling a mod</strong> edits the viewed profile only. On the main menu, if that is also the active profile, the change goes straight to the game like vanilla; otherwise it waits for <strong>Apply Profile</strong>.</li>
-<li style="margin:6px 0"><strong>Apply Profile</strong> makes the viewed profile active: it writes the game's own settings, so the game boots with that set every launch, with or without BetterMods. Deleting the active profile applies the first remaining one.</li>
-<li style="margin:6px 0">Mods the game changes itself (for example when joining a server) are folded into the active profile. Blocklisted mods stay blocked.</li>
-<li style="margin:6px 0">Profiles live in <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\bettermods.json</code> (plus a <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">.bak</code>). If it exists but cannot be read, BetterMods shows "Not saving - config unreadable" and never overwrites it.</li>
+<li style="margin: 6px 0;"><strong>Tabs:</strong> left-click to view and edit a profile. <strong>+</strong> creates "Profile N" as a copy of the one you are viewing. Right-click to rename (Enter saves, Esc cancels) or delete (second click confirms). The last profile cannot be deleted.</li>
+<li style="margin: 6px 0;"><strong>Viewed vs active:</strong> the selected tab is the one your clicks edit; the active profile is the one the game loads. The Mods screen always opens on the active one.</li>
+<li style="margin: 6px 0;"><strong>Toggling a mod</strong> edits the viewed profile only. On the main menu, if that is also the active profile, the change goes straight to the game like vanilla; otherwise it waits for <strong>Apply Profile</strong>.</li>
+<li style="margin: 6px 0;"><strong>Apply Profile</strong> makes the viewed profile active: it writes the game's own settings, so the game boots with that set every launch, with or without BetterMods. Deleting the active profile applies the first remaining one.</li>
+<li style="margin: 6px 0;">Mods the game changes itself (for example when joining a server) are folded into the active profile. Blocklisted mods stay blocked.</li>
+<li style="margin: 6px 0;">Profiles live in <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\bettermods.json</code> (plus a <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">.bak</code>). If it exists but cannot be read, BetterMods shows "Not saving - config unreadable" and never overwrites it.</li>
 </ul>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">The in-game Mod Profiles dialog</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">The in-game Mod Profiles dialog</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <p>The same tabs, cards, version picker and <strong>Apply Profile</strong>, inside a running world. Bind a key to <strong>Mod Profiles</strong> under <strong>Settings &gt; Controls</strong> (none by default). In game, Apply Profile <strong>takes effect at the next world load</strong> - no restart, except for the version case below.</p>
-<table style="border-collapse:collapse;width:100%;max-width:640px;margin:12px 0">
-<tr><th style="text-align:left;padding:8px 10px;background:#e7dece;border:1px solid #d7cfbf">&nbsp;</th><th style="padding:8px 10px;background:#e7dece;border:1px solid #d7cfbf">Main menu</th><th style="padding:8px 10px;background:#e7dece;border:1px solid #d7cfbf">In game</th></tr>
-<tr><td style="padding:7px 10px;border:1px solid #e1d8c7">Profiles, toggles, versions, Apply</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes (next world load)</td></tr>
-<tr><td style="padding:7px 10px;border:1px solid #e1d8c7">Update check, tooltips, Open mod page, Add Shortcut</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes</td></tr>
-<tr><td style="padding:7px 10px;border:1px solid #e1d8c7">Download and install updates</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">no</td></tr>
-<tr><td style="padding:7px 10px;border:1px solid #e1d8c7">Fix dependencies</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">yes, with downloads</td><td style="text-align:center;padding:7px 10px;border:1px solid #e1d8c7">installed versions only</td></tr>
+<table style="border-collapse: collapse; width: 100%; max-width: 640px; margin: 12px 0;">
+<tbody>
+<tr>
+<th style="text-align: left; padding: 8px 10px; background: #e7dece; border: 1px solid #d7cfbf;">&nbsp;</th>
+<th style="padding: 8px 10px; background: #e7dece; border: 1px solid #d7cfbf;">Main menu</th>
+<th style="padding: 8px 10px; background: #e7dece; border: 1px solid #d7cfbf;">In game</th>
+</tr>
+<tr>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;">Profiles, toggles, versions, Apply</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes (next world load)</td>
+</tr>
+<tr>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;">Update check, tooltips, Open mod page, Add Shortcut</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes</td>
+</tr>
+<tr>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;">Download and install updates</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">no</td>
+</tr>
+<tr>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7;">Fix dependencies</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">yes, with downloads</td>
+<td style="text-align: center; padding: 7px 10px; border: 1px solid #e1d8c7;">installed versions only</td>
+</tr>
+</tbody>
 </table>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Mod cards, versions and the restart notice</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/05-tooltip.png" alt="Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason</div></div>
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Mod cards, versions and the restart notice</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/05-tooltip.png" alt="Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason</div>
+</div>
 <ul>
-<li style="margin:6px 0"><strong>Fixed-height cards:</strong> icon, title and version on top, buttons along the bottom (Add Shortcut, Fix dependencies, Open mod page, Update to x.y.z). Hover for authors, description, dependencies and update details.</li>
-<li style="margin:6px 0"><strong>Yellow triangle</strong> by the version: an update is available. <strong>(Retracted)</strong>: the installed release was retracted on the mod DB; the tooltip gives the reason.</li>
-<li style="margin:6px 0"><strong>Core-mod protection:</strong> switching off <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">game</code>, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">survival</code>, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">creative</code> or another core mod asks first, with the game's own warning.</li>
+<li style="margin: 6px 0;"><strong>Fixed-height cards:</strong> icon, title and version on top, buttons along the bottom (Add Shortcut, Fix dependencies, Open mod page, Update to x.y.z). Hover for authors, description, dependencies and update details.</li>
+<li style="margin: 6px 0;"><strong>Yellow triangle</strong> by the version: an update is available. <strong>(Retracted)</strong>: the installed release was retracted on the mod DB; the tooltip gives the reason.</li>
+<li style="margin: 6px 0;"><strong>Core-mod protection:</strong> switching off <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">game</code>, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">survival</code>, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">creative</code> or another core mod asks first, with the game's own warning.</li>
 </ul>
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/03-version-dropdown.png" alt="Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked</div></div>
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/03-version-dropdown.png" alt="Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked</div>
+</div>
 <ul>
-<li style="margin:6px 0"><strong>Several versions of one mod</strong> share one card. Click the arrow on the version label and pick one: it is switched on in the viewed profile and the others are switched off.</li>
-<li style="margin:6px 0"><strong>Restart notice:</strong> the game cannot swap the code of a mod it already loaded this session. Pointing a profile at a <em>different version</em> of such a mod shows "Restart needed - version changed". Never after a fresh launch, for mods that are off, for content-only mods, or for plain enable/disable.</li>
+<li style="margin: 6px 0;"><strong>Several versions of one mod</strong> share one card. Click the arrow on the version label and pick one: it is switched on in the viewed profile and the others are switched off.</li>
+<li style="margin: 6px 0;"><strong>Restart notice:</strong> the game cannot swap the code of a mod it already loaded this session. Pointing a profile at a <em>different version</em> of such a mod shows "Restart needed - version changed". Never after a fresh launch, for mods that are off, for content-only mods, or for plain enable/disable.</li>
 </ul>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Update checking and installing</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/04-update-and-retracted.png" alt="Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted)" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted)</div></div>
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Update checking and installing</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/04-update-and-retracted.png" alt="Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted)" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted)</div>
+</div>
 <ul>
-<li style="margin:6px 0"><strong>When:</strong> once per session in the background, the first time you open the Mods screen or the in-game dialog; again on <strong>Reload Mods</strong> or the status button. Never on a timer.</li>
-<li style="margin:6px 0"><strong>Exact game version only:</strong> an update is offered only for a newer release tagged for the exact version you run (e.g. 1.23.0-pre.1). Never stable onto pre-release.</li>
-<li style="margin:6px 0"><strong>Older game version:</strong> with nothing for your version, BetterMods also looks at the newest stable version before it (e.g. 1.22.7). Those show a yellow <strong>Update to x.y.z (1.22)</strong>, <strong>ask you first</strong>, and are <strong>not included in Update all</strong>.</li>
-<li style="margin:6px 0"><strong>Honest wording:</strong> few mods are tagged for a preview build yet, so the status says "No newer releases for 1.23.0-pre.1", never "up to date".</li>
-<li style="margin:6px 0">Not checked: core mods, BetterMods itself, mods whose modinfo failed to load, and anything inside the game folder.</li>
+<li style="margin: 6px 0;"><strong>When:</strong> once per session in the background, the first time you open the Mods screen or the in-game dialog; again on <strong>Reload Mods</strong> or the status button. Never on a timer.</li>
+<li style="margin: 6px 0;"><strong>Exact game version only:</strong> an update is offered only for a newer release tagged for the exact version you run (e.g. 1.23.0-pre.1). Never stable onto pre-release.</li>
+<li style="margin: 6px 0;"><strong>Older game version:</strong> with nothing for your version, BetterMods also looks at the newest stable version before it (e.g. 1.22.7). Those show a yellow <strong>Update to x.y.z (1.22)</strong>, <strong>ask you first</strong>, and are <strong>not included in Update all</strong>.</li>
+<li style="margin: 6px 0;"><strong>Honest wording:</strong> few mods are tagged for a preview build yet, so the status says "No newer releases for 1.23.0-pre.1", never "up to date".</li>
+<li style="margin: 6px 0;">Not checked: core mods, BetterMods itself, mods whose modinfo failed to load, and anything inside the game folder.</li>
 </ul>
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/08-tooltip-update.png" alt="Tooltip of a mod with an update tagged for the exact game version: the green Update available line" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Tooltip of a mod with an update tagged for the exact game version: the green Update available line</div></div>
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/08-tooltip-update.png" alt="Tooltip of a mod with an update tagged for the exact game version: the green Update available line" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Tooltip of a mod with an update tagged for the exact game version: the green Update available line (Also Bannta you should go lookup what Semver is and what the numbers mean)</div>
+</div>
 <p><strong>Installing</strong> happens only when you click <strong>Update to ...</strong> or <strong>Update all</strong>, and only on the main menu:</p>
 <ul>
-<li style="margin:6px 0"><strong>Old versions are never deleted</strong> - the new file goes next to the old one and both stay in the version drop-down.</li>
-<li style="margin:6px 0"><strong>Only the viewed profile</strong> switches to the new version; every other profile keeps its own.</li>
-<li style="margin:6px 0">Every download is checked - see <strong>Safety</strong> below.</li>
+<li style="margin: 6px 0;"><strong>Old versions are never deleted</strong> - the new file goes next to the old one and both stay in the version drop-down.</li>
+<li style="margin: 6px 0;"><strong>Only the viewed profile</strong> switches to the new version; every other profile keeps its own.</li>
+<li style="margin: 6px 0;">Every download is checked - see <strong>Safety</strong> below.</li>
 </ul>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Open mod page and trusted links</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p style="font-weight:bold">BECUASE I DON'T WANT TO HIT CONFIRM EVERY TIME</p>
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Open mod page and trusted links</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<p style="font-weight: bold;">BECUASE I DON'T WANT TO HIT CONFIRM EVERY TIME</p>
 <ul>
-<li style="margin:6px 0"><strong>Open mod page</strong> is on the card of every mod the update check found on the DB. It looks the page up once per mod per session and opens it in your browser.</li>
-<li style="margin:6px 0">The first time, you choose <strong>Cancel</strong>, <strong>Always trust mods.vintagestory.at</strong>, or <strong>Open</strong>. Trust applies only to the mod page links BetterMods builds itself; every other link keeps the game's normal confirmation.</li>
-<li style="margin:6px 0">To undo "Always trust": with the game closed, remove the site from <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">"TrustedLinkHosts"</code> in <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\bettermods.json</code>. There is no in-game switch.</li>
+<li style="margin: 6px 0;"><strong>Open mod page</strong> is on the card of every mod the update check found on the DB. It looks the page up once per mod per session and opens it in your browser.</li>
+<li style="margin: 6px 0;">The first time, you choose <strong>Cancel</strong>, <strong>Always trust mods.vintagestory.at</strong>, or <strong>Open</strong>. Trust applies only to the mod page links BetterMods builds itself; every other link keeps the game's normal confirmation.</li>
+<li style="margin: 6px 0;">To undo "Always trust": with the game closed, remove the site from <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">"TrustedLinkHosts"</code> in <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\bettermods.json</code>. There is no in-game switch.</li>
 </ul>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Fix dependencies</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Fix dependencies</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <p>A mod that is on in the viewed profile, with a dependency that is missing, off or too old, gets a yellow <strong>Fix dependencies</strong> button; the tooltip lists each problem. Clicking it, for the <strong>viewed profile only</strong>:</p>
 <ol>
-<li style="margin:6px 0"><strong>Uses what you have</strong> - switches on the newest installed version that satisfies the requirement.</li>
-<li style="margin:6px 0"><strong>Downloads what is missing</strong> (main menu only) - the newest release for your game version, or, after asking, one for the older game version.</li>
-<li style="margin:6px 0"><strong>Follows the chain</strong> - a new dependency's own dependencies are fixed too.</li>
+<li style="margin: 6px 0;"><strong>Uses what you have</strong> - switches on the newest installed version that satisfies the requirement.</li>
+<li style="margin: 6px 0;"><strong>Downloads what is missing</strong> (main menu only) - the newest release for your game version, or, after asking, one for the older game version.</li>
+<li style="margin: 6px 0;"><strong>Follows the chain</strong> - a new dependency's own dependencies are fixed too.</li>
 </ol>
-<p>Anything it could not do is listed in the status line, the tooltip and the log - nothing is half-done silently. Requirements on the game itself (<code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">game</code>, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">survival</code>, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">creative</code>, other core mods) are shown and left to you.</p>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Worlds remember their profile and mods (singleplayer only)</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<div style="margin:4px 0 14px;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/06-world-list-tooltip.png" alt="Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with</div></div>
-<ul>
-<li style="margin:6px 0"><strong>Singleplayer only.</strong> Starting one of your singleplayer worlds binds it to the active profile and records which mods it loaded with. On a multiplayer server: no binding, no recorded mod list, no chat notice.</li>
-<li style="margin:6px 0"><strong>One prompt, only when it matters:</strong> mods the world used are not enabled, another profile matches the world exactly, or the world is bound to a different profile. Version differences and extra mods alone never ask.</li>
-<li style="margin:6px 0"><strong>Switch to ...</strong> applies the suggested profile and starts the world. <strong>Play with ...</strong> starts it as it is and rebinds it. <strong>Cancel</strong> goes back.</li>
-<li style="margin:6px 0"><strong>World list tooltip:</strong> a world's profile and the mods it last loaded with.</li>
-<li style="margin:6px 0"><strong>Copied worlds:</strong> a small record inside the save travels with it. Never written into a read-only save, one being upgraded, or one being repaired.</li>
-<li style="margin:6px 0"><strong>Without the startup hook</strong> the first world of a session starts before BetterMods runs, so instead of a prompt you get a <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">[BetterMods]</code> chat line if something did not match.</li>
-</ul>
-</div></div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Saved playstyles (Accepted feature creep)</h2>
-<div style="background:#fff6e5;border:1px solid #e8cf9a;border-left:5px solid #c8942e;border-radius:8px;padding:12px 16px;margin:12px 0 14px 0">
-<p style="line-height:1.6;margin:0"><strong>Accepted feature creep.</strong> This has nothing to do with mod profiles. It lives in BetterMods because I'm lazy and a separate mod just for two buttons on one screen was not worth it.</p>
+<p>Anything it could not do is listed in the status line, the tooltip and the log - nothing is half-done silently. Requirements on the game itself (<code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">game</code>, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">survival</code>, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">creative</code>, other core mods) are shown and left to you.</p>
 </div>
-<div style="margin:14px 0;padding:8px;border:1px solid #d7cfbf;border-radius:10px"><img src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/09-saved-playstyles.png" alt="Create New World with Save and Delete playstyle, and a saved custom playstyle" style="max-width:100%;height:auto;border-radius:6px;display:block;margin:0 auto"><div style="font-size:0.85em;color:#7a6f5f;margin-top:6px;text-align:center">Create New World with Save and Delete playstyle, and a saved custom playstyle</div></div>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>Save playstyle</strong> (on the <strong>Select A Playstyle</strong> row of Create New World) saves the selected playstyle, everything you changed under <strong>Customize</strong> and the world height under a name. The seed and world name are never saved.</li>
-<li style="margin:6px 0">Saved playstyles appear in the list tagged <strong>Custom</strong> with a line like "Based on Standard, world height 256.". Picking one applies all its settings and its height.</li>
-<li style="margin:6px 0"><strong>Delete playstyle</strong> asks first, and is disabled for the game's own playstyles, ones mods define in <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">worldconfig.json</code>, and files a mod marked read-only.</li>
-<li style="margin:6px 0"><strong>Worlds stay vanilla:</strong> a world is created as the base playstyle with the saved settings applied, and loads the same without BetterMods.</li>
-<li style="margin:6px 0">A missing base playstyle greys the entry out as <strong>Unavailable</strong> - the only thing that blocks an entry. Settings it cannot use (missing mods, unknown keys, invalid values) are skipped and the entry still loads; hover it to see what was skipped.</li>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Worlds remember their profile and mods (singleplayer only)</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<div style="margin: 4px 0 14px; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/06-world-list-tooltip.png" alt="Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with</div>
+</div>
+<ul>
+<li style="margin: 6px 0;"><strong>Singleplayer only.</strong> Starting one of your singleplayer worlds binds it to the active profile and records which mods it loaded with. On a multiplayer server: no binding, no recorded mod list, no chat notice.</li>
+<li style="margin: 6px 0;"><strong>One prompt, only when it matters:</strong> mods the world used are not enabled, another profile matches the world exactly, or the world is bound to a different profile. Version differences and extra mods alone never ask.</li>
+<li style="margin: 6px 0;"><strong>Switch to ...</strong> applies the suggested profile and starts the world. <strong>Play with ...</strong> starts it as it is and rebinds it. <strong>Cancel</strong> goes back.</li>
+<li style="margin: 6px 0;"><strong>World list tooltip:</strong> a world's profile and the mods it last loaded with.</li>
+<li style="margin: 6px 0;"><strong>Copied worlds:</strong> a small record inside the save travels with it. Never written into a read-only save, one being upgraded, or one being repaired.</li>
+<li style="margin: 6px 0;"><strong>Without the startup hook</strong> the first world of a session starts before BetterMods runs, so instead of a prompt you get a <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">[BetterMods]</code> chat line if something did not match.</li>
 </ul>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">For mod authors: the .vsplaystyle format</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p>Any mod (or player) can add playstyles by writing <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;name&gt;.vsplaystyle</code> files (UTF-8 JSON, name from <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">A-Z a-z 0-9 _ -</code>, 1-128 characters) directly into <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">&lt;data path&gt;\Playstyles\</code> - exactly what <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">api.GetOrCreateDataPath("Playstyles")</code> returns.</p>
-<pre style="background:#f4efe4;border:1px solid #e3d7bd;border-radius:6px;padding:10px 12px;overflow:auto;line-height:1.45">{
+</div>
+</div>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Saved playstyles (Accepted feature creep)</h2>
+<div style="background: #fff6e5; border: 1px solid #e8cf9a; border-left: 5px solid #c8942e; border-radius: 8px; padding: 12px 16px; margin: 12px 0 14px 0;">
+<p style="line-height: 1.6; margin: 0;"><strong>Accepted feature creep.</strong> This has nothing to do with mod profiles. It lives in BetterMods because I'm lazy, and a separate mod just for two buttons on one screen was not worth it.</p>
+</div>
+<div style="margin: 14px 0; padding: 8px; border: 1px solid #d7cfbf; border-radius: 10px;"><img style="max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/09-saved-playstyles.png" alt="Create New World with Save and Delete playstyle, and a saved custom playstyle" />
+<div style="font-size: 0.85em; color: #7a6f5f; margin-top: 6px; text-align: center;">Create New World with Save and Delete playstyle, and a saved custom playstyle</div>
+</div>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><strong>Save playstyle</strong> (on the <strong>Select A Playstyle</strong> row of Create New World) saves the selected playstyle, everything you changed under <strong>Customize</strong> and the world height under a name. The seed and world name are never saved.</li>
+<li style="margin: 6px 0;">Saved playstyles appear in the list tagged <strong>Custom</strong> with a line like "Based on Standard, world height 256.". Picking one applies all its settings and its height.</li>
+<li style="margin: 6px 0;"><strong>Delete playstyle</strong> asks first, and is disabled for the game's own playstyles, ones mods define in <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">worldconfig.json</code>, and files a mod marked read-only.</li>
+<li style="margin: 6px 0;"><strong>Worlds stay vanilla:</strong> a world is created as the base playstyle with the saved settings applied, and loads the same without BetterMods.</li>
+<li style="margin: 6px 0;">A missing base playstyle greys the entry out as <strong>Unavailable</strong> - the only thing that blocks an entry. Settings it cannot use (missing mods, unknown keys, invalid values) are skipped and the entry still loads; hover it to see what was skipped.</li>
+</ul>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">For mod authors: the .vsplaystyle format</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<p>Any mod (or player) can add playstyles by writing <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">&lt;name&gt;.vsplaystyle</code> files (UTF-8 JSON, name from <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">A-Z a-z 0-9 _ -</code>, 1-128 characters) directly into <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">&lt;data path&gt;\Playstyles\</code> - exactly what <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">api.GetOrCreateDataPath("Playstyles")</code> returns.</p>
+<pre style="background: #f4efe4; border: 1px solid #e3d7bd; border-radius: 6px; padding: 10px 12px; overflow: auto; line-height: 1.45;">{
   "format": "vsplaystyle",
   "name": "Hardcore Survival",
   "description": "Survive and Build with one life and harsh winters.",
@@ -203,80 +268,93 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
   "author": "YourMod"
 }</pre>
 <ul>
-<li style="margin:6px 0"><strong>format</strong> (optional): "vsplaystyle" - a type marker, never checked; the .vsplaystyle extension is what counts. There is <strong>no version number</strong>: unknown fields are ignored, including the formatVersion, gameVersion and createdBy older files carry, so those keep loading.</li>
-<li style="margin:6px 0"><strong>basePlaystyle</strong> (required): a real playstyle code; the world is created as it. <strong>worldConfig</strong>: sparse overrides keyed by world-config attribute code, as in a <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">worldconfig.json</code> playstyle.</li>
-<li style="margin:6px 0"><strong>worldHeight</strong> (default 256): rounded to 128-512 in steps of 64 (to 2048 for creativebuilding).</li>
-<li style="margin:6px 0"><strong>readOnly: true</strong> for files your mod supplies - never deleted or overwritten, tagged "By &lt;author&gt;" (or "From a mod").</li>
-<li style="margin:6px 0"><strong>Data only:</strong> plain JSON, nothing executed; at most 200 files of 64 KB. Only a file that is not JSON, has no basePlaystyle or has a bad name is skipped (and logged); a basePlaystyle that is not installed shows the entry as Unavailable. Each value is checked against its attribute (ranges clamped, dropdowns must match, no &lt; or &gt; in text); a rejected value keeps the base value and unknown keys are skipped - <strong>the entry still loads</strong>, and its tooltip and the log say what was skipped.</li>
+<li style="margin: 6px 0;"><strong>format</strong> (optional): "vsplaystyle" - a type marker, never checked; the .vsplaystyle extension is what counts. There is <strong>no version number</strong>: unknown fields are ignored, including the formatVersion, gameVersion and createdBy older files carry, so those keep loading.</li>
+<li style="margin: 6px 0;"><strong>basePlaystyle</strong> (required): a real playstyle code; the world is created as it. <strong>worldConfig</strong>: sparse overrides keyed by world-config attribute code, as in a <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">worldconfig.json</code> playstyle.</li>
+<li style="margin: 6px 0;"><strong>worldHeight</strong> (default 256): rounded to 128-512 in steps of 64 (to 2048 for creativebuilding).</li>
+<li style="margin: 6px 0;"><strong>readOnly: true</strong> for files your mod supplies - never deleted or overwritten, tagged "By &lt;author&gt;" (or "From a mod").</li>
+<li style="margin: 6px 0;"><strong>Data only:</strong> plain JSON, nothing executed; at most 200 files of 64 KB. Only a file that is not JSON, has no basePlaystyle or has a bad name is skipped (and logged); a basePlaystyle that is not installed shows the entry as Unavailable. Each value is checked against its attribute (ranges clamped, dropdowns must match, no &lt; or &gt; in text); a rejected value keeps the base value and unknown keys are skipped - <strong>the entry still loads</strong>, and its tooltip and the log say what was skipped.</li>
 </ul>
-</div></div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Safety</h2>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>Downloads only when you click</strong> Update, Update all or Fix dependencies, and only on the main menu.</li>
-<li style="margin:6px 0"><strong>https only, mod DB only:</strong> mods.vintagestory.at and its download server moddbcdn.vintagestory.at, checked again after redirects.</li>
-<li style="margin:6px 0"><strong>Verified before use:</strong> each download must be a valid zip whose modinfo.json names exactly the mod and version asked for. Retracted and blocklisted releases are never installed.</li>
-<li style="margin:6px 0"><strong>Never overwrites</strong> a file, and never deletes an old version.</li>
-<li style="margin:6px 0"><strong>Fails safe:</strong> a patch broken by a game update falls back to vanilla instead of crashing. If another mod strips all Harmony patches, BetterMods puts its own back.</li>
-<li style="margin:6px 0"><strong>Profiles are protected:</strong> an unreadable file is never overwritten; a damaged one is kept as <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">bettermods.json.corrupt</code> and the last good <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">.bak</code> is used.</li>
+</div>
+</div>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Safety</h2>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><strong>Downloads only when you click</strong> Update, Update all or Fix dependencies, and only on the main menu.</li>
+<li style="margin: 6px 0;"><strong>https only, mod DB only:</strong> mods.vintagestory.at and its download server moddbcdn.vintagestory.at, checked again after redirects.</li>
+<li style="margin: 6px 0;"><strong>Verified before use:</strong> each download must be a valid zip whose modinfo.json names exactly the mod and version asked for. Retracted and blocklisted releases are never installed.</li>
+<li style="margin: 6px 0;"><strong>Never overwrites</strong> a file, and never deletes an old version.</li>
+<li style="margin: 6px 0;"><strong>Fails safe:</strong> a patch broken by a game update falls back to vanilla instead of crashing. If another mod strips all Harmony patches, BetterMods puts its own back.</li>
+<li style="margin: 6px 0;"><strong>Profiles are protected:</strong> an unreadable file is never overwritten; a damaged one is kept as <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">bettermods.json.corrupt</code> and the last good <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">.bak</code> is used.</li>
 </ul>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Multiplayer</h2>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><strong>Client-only.</strong> Servers do not need it, do not see it, and it works on any server.</li>
-<li style="margin:6px 0">What a server makes you load is up to the server and the game's own mod download screen; profiles decide only what <em>your</em> client has enabled.</li>
-<li style="margin:6px 0"><strong>World binding is singleplayer only</strong> - on a server BetterMods binds no profile, records no mod list and posts no chat notices.</li>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Multiplayer</h2>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><strong>Client-only.</strong> Servers do not need it, do not see it, and it works on any server.</li>
+<li style="margin: 6px 0;">What a server makes you load is up to the server and the game's own mod download screen; profiles decide only what <em>your</em> client has enabled.</li>
+<li style="margin: 6px 0;"><strong>World binding is singleplayer only</strong> - on a server BetterMods binds no profile, records no mod list and posts no chat notices.</li>
 </ul>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Network use</h2>
-<p style="line-height:1.6;margin:8px 0">BetterMods contacts only the mod DB set in the game (default <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">https://mods.vintagestory.at</code>) and its download server:</p>
-<table style="border-collapse:collapse;width:100%;max-width:640px;margin:12px 0">
-<tr><th style="text-align:left;padding:8px 10px;background:#e7dece;border:1px solid #d7cfbf">When</th><th style="text-align:left;padding:8px 10px;background:#e7dece;border:1px solid #d7cfbf">What is sent / fetched</th></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">First open of the Mods screen or dialog per session; Reload Mods; the status button</td><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">Your game version and the ids and versions of your installed mods (core mods and BetterMods excluded)</td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">Open mod page</td><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">One lookup of that mod's page address</td></tr>
-<tr><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">Update, Update all, Fix dependencies</td><td style="vertical-align:top;padding:7px 10px;border:1px solid #e1d8c7">Downloads of the releases you chose</td></tr>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Network use</h2>
+<p style="line-height: 1.6; margin: 8px 0;">BetterMods contacts only the mod DB set in the game (default <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">https://mods.vintagestory.at</code>) and its download server:</p>
+<table style="border-collapse: collapse; width: 100%; max-width: 640px; margin: 12px 0;">
+<tbody>
+<tr>
+<th style="text-align: left; padding: 8px 10px; background: #e7dece; border: 1px solid #d7cfbf;">When</th>
+<th style="text-align: left; padding: 8px 10px; background: #e7dece; border: 1px solid #d7cfbf;">What is sent / fetched</th>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">First open of the Mods screen or dialog per session; Reload Mods; the status button</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Your game version and the ids and versions of your installed mods (core mods and BetterMods excluded)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Open mod page</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">One lookup of that mod's page address</td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Update, Update all, Fix dependencies</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Downloads of the releases you chose</td>
+</tr>
+</tbody>
 </table>
-<p style="line-height:1.6;margin:8px 0">Nothing else: no telemetry, no other sites.</p>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Known limitations and FAQ</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
+<p style="line-height: 1.6; margin: 8px 0;">Nothing else: no telemetry, no other sites.</p>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Known limitations and FAQ</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <ul>
-<li style="margin:6px 0"><strong>No tabs on the main menu?</strong> Load a world once, or use Add Shortcut. With the hook, check <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Logs\bettermods-hook.log</code>.</li>
-<li style="margin:6px 0"><strong>Zip install + hook:</strong> the first launch after installing or updating BetterMods is vanilla until a world loads (the game only unpacks zips then).</li>
-<li style="margin:6px 0"><strong>"Restart needed - version changed"?</strong> You picked another version of a mod you already played with this session. Restart, or pick the version you were using.</li>
-<li style="margin:6px 0"><strong>"No newer releases for 1.23.0-pre.1"?</strong> Not "up to date" - nothing on the DB is tagged for your exact version yet.</li>
-<li style="margin:6px 0"><strong>Applied a profile in game and nothing changed?</strong> It takes effect at the next world load.</li>
-<li style="margin:6px 0"><strong>A mod I added by hand is on in every profile.</strong> Profiles record what is off, so new mods start on everywhere. Updates BetterMods installs itself only go to the viewed profile.</li>
-<li style="margin:6px 0"><strong>A mod copied in while the game runs is missing.</strong> Press Reload Mods, as in vanilla.</li>
-<li style="margin:6px 0"><strong>Odd characters show as ?</strong> - the card font is ASCII-only.</li>
-<li style="margin:6px 0"><strong>Saved playstyles based on Creative Building</strong> are not treated as creative by the game's new-world checks, and Customize caps the height at 512. The world is still created as Creative Building.</li>
-<li style="margin:6px 0"><strong>The game will not start after setting <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">DOTNET_STARTUP_HOOKS</code> myself.</strong> Remove the variable and use the shortcut instead.</li>
-<li style="margin:6px 0">BetterMods patches the vanilla Mods screen; another mod changing the same screen may conflict.</li>
+<li style="margin: 6px 0;"><strong>No tabs on the main menu?</strong> Load a world once, or use Add Shortcut. With the hook, check <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\bettermods-hook.log</code>.</li>
+<li style="margin: 6px 0;"><strong>Zip install + hook:</strong> the first launch after installing or updating BetterMods is vanilla until a world loads (the game only unpacks zips then).</li>
+<li style="margin: 6px 0;"><strong>"Restart needed - version changed"?</strong> You picked another version of a mod you already played with this session. Restart, or pick the version you were using.</li>
+<li style="margin: 6px 0;"><strong>"No newer releases for 1.23.0-pre.1"?</strong> Not "up to date" - nothing on the DB is tagged for your exact version yet.</li>
+<li style="margin: 6px 0;"><strong>Applied a profile in game and nothing changed?</strong> It takes effect at the next world load.</li>
+<li style="margin: 6px 0;"><strong>A mod I added by hand is on in every profile.</strong> Profiles record what is off, so new mods start on everywhere. Updates BetterMods installs itself only go to the viewed profile.</li>
+<li style="margin: 6px 0;"><strong>A mod copied in while the game runs is missing.</strong> Press Reload Mods, as in vanilla.</li>
+<li style="margin: 6px 0;"><strong>Odd characters show as ?</strong> - the card font is ASCII-only.</li>
+<li style="margin: 6px 0;"><strong>Saved playstyles based on Creative Building</strong> are not treated as creative by the game's new-world checks, and Customize caps the height at 512. The world is still created as Creative Building.</li>
+<li style="margin: 6px 0;"><strong>The game will not start after setting <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> myself.</strong> Remove the variable and use the shortcut instead.</li>
+<li style="margin: 6px 0;">BetterMods patches the vanilla Mods screen; another mod changing the same screen may conflict.</li>
 </ul>
-</div></div>
-
-<div class="spoiler" style="margin:18px 0;border:1px solid #d7cfbf;border-radius:10px;overflow:hidden;background:#faf7f0"><div class="spoiler-toggle" style="padding:12px 16px;background:linear-gradient(180deg,#e7dece 0%,#ddd2be 100%);font-weight:bold;cursor:pointer">Where BetterMods keeps its data, and uninstalling</div><div class="spoiler-text" style="padding:14px 18px;line-height:1.6;border-top:1px solid #ddd3c2">
-<p>Under <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">%APPDATA%\VintagestoryData\</code> on Windows (or your <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">--dataPath</code>):</p>
+</div>
+</div>
+<div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
+<div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Where BetterMods keeps its data, and uninstalling</div>
+<div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
+<p>Under <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\VintagestoryData\</code> on Windows (or your <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">--dataPath</code>):</p>
 <ul>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\bettermods.json</code> (+ <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">.bak</code>) - profiles, world bindings, recorded mod lists, trusted sites</li>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\BetterMods\BetterModsHook.dll</code> - the startup hook</li>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Mods\</code> - updates and dependencies it downloads</li>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Logs\bettermods-hook.log</code> - the hook's log</li>
-<li style="margin:6px 0">Each singleplayer save - a small record of its profile and mod list</li>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Playstyles\*.vsplaystyle</code> - saved playstyles</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\bettermods.json</code> (+ <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">.bak</code>) - profiles, world bindings, recorded mod lists, trusted sites</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\BetterMods\BetterModsHook.dll</code> - the startup hook</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Mods\</code> - updates and dependencies it downloads</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\bettermods-hook.log</code> - the hook's log</li>
+<li style="margin: 6px 0;">Each singleplayer save - a small record of its profile and mod list</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Playstyles\*.vsplaystyle</code> - saved playstyles</li>
 </ul>
-<p><strong>Uninstalling:</strong> remove the zip; the game keeps the last profile you applied. Optionally, with the game closed, delete the desktop shortcut, <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\BetterMods\</code> and <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">ModConfig\bettermods.json</code>. A leftover hook and shortcut are harmless - the game just starts normally.</p>
-</div></div>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Bug reports</h2>
-<p style="line-height:1.6;margin:8px 0">Don't bother me but When reporting a bug, please include your game version, BetterMods version, both log files, what you clicked, and what you expected to see. A screenshot of the Mods screen helps.</p>
-<ul style="line-height:1.6;padding-left:22px;margin:8px 0">
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Logs\client-main.log</code> - every BetterMods line starts with <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">[BetterMods]</code>.</li>
-<li style="margin:6px 0"><code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">Logs\bettermods-hook.log</code> - one line per hooked launch saying what the hook did.</li>
+<p><strong>Uninstalling:</strong> remove the zip; the game keeps the last profile you applied. Optionally, with the game closed, delete the desktop shortcut, <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\BetterMods\</code> and <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\bettermods.json</code>. A leftover hook and shortcut are harmless - the game just starts normally.</p>
+</div>
+</div>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Bug reports</h2>
+<p style="line-height: 1.6; margin: 8px 0;">Don't bother me but When reporting a bug, please include your game version, BetterMods version, both log files, what you clicked, and what you expected to see. A screenshot of the Mods screen helps.</p>
+<ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\client-main.log</code> - every BetterMods line starts with <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">[BetterMods]</code>.</li>
+<li style="margin: 6px 0;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\bettermods-hook.log</code> - one line per hooked launch saying what the hook did.</li>
 </ul>
-<p style="line-height:1.6;margin:8px 0">Post in the comments, or the Issues tab where linked.</p>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">Credits</h2>
-<p style="line-height:1.6;margin:8px 0">BetterMods by Seggr. Thanks to everyone who reports bugs and tests preview builds.</p>
-
-<h2 style="margin:28px 0 10px 0;padding-bottom:4px;border-bottom:1px solid #e4dccb;color:#3a342c">License</h2>
-<p style="line-height:1.6;margin:8px 0"><strong>0BSD (Zero-Clause BSD)</strong> - use, copy, modify and distribute BetterMods' own code and docs for any purpose, no attribution required. That covers BetterMods only: Vintage Story and its API, Harmony, the mods it downloads and everything else it works with stay under their own licences and terms, which you must follow. Details in <code style="background:#efe8da;padding:1px 5px;border-radius:4px;overflow-wrap:anywhere">THIRD-PARTY-NOTICES.md</code>, included in every download.</p>
+<p style="line-height: 1.6; margin: 8px 0;">Post in the comments, or the Issues tab where linked.</p>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Credits</h2>
+<p style="line-height: 1.6; margin: 8px 0;">BetterMods by Seggr. Thanks to everyone who reports bugs and tests preview builds.</p>
+<h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">License</h2>
+<p style="line-height: 1.6; margin: 8px 0;"><strong>0BSD (Zero-Clause BSD)</strong> - use, copy, modify and distribute BetterMods' own code and docs for any purpose, no attribution required. That covers BetterMods only: Vintage Story and its API, Harmony, the mods it downloads and everything else it works with stay under their own licences and terms, which you must follow. Details in <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">THIRD-PARTY-NOTICES.md</code>, included in every download.</p>
