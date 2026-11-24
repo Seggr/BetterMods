@@ -2,7 +2,7 @@
 
 # Lets be clear: this is a filthy Hack of a mod
 
-> **This is the `1.22.x` branch: the Vintage Story 1.22 build of BetterMods.** The Vintage Story 1.23
+> **This is the `1.22.x` branch: the Vintage Story 1.22 build of BetterMods (1.2.1).** The Vintage Story 1.23
 > build lives on [`main`](https://github.com/Seggr/BetterMods/tree/main).
 
 This mod introduces features I believe should be stock in the game, and I hope the developers look at this and say "oh yes, he is correct; this is how it should be" and then implement everything it does. They don't even need to say thank you, I'll know ;3
@@ -36,7 +36,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 | | |
 |---|---|
 | Side | **Client only.** Servers neither need nor see it; it works on any server. |
-| Game version | **Vintage Story 1.22.7** (1.22.x). For 1.23, use the build from the `main` branch. |
+| Game version | **Vintage Story 1.22.0+** (1.22.x). For 1.23, use the build from the `main` branch. |
 | Open it | Main menu: **Mods** screen. In game: the **Mod Profiles** dialog - bind a key to it under **Settings > Controls** (none by default). |
 | Restart needed? | Only when a profile switches a mod you already used this session to a *different version*. Enabling and disabling mods never needs one. |
 

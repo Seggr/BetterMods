@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- This branch builds against Vintage Story 1.22 (1.22.7), which runs on net10.0
+    <!-- This branch builds against Vintage Story 1.22 - releases compile against the OLDEST 1.22.x
+         they support (modinfo.json's dependencies.game, 1.22.0), whose assemblies are stamped
+         assembly version 1.0.0.0, a reference every later 1.22.x (1.22.x.0) satisfies. Every 1.22
+         release runs on net10.0
          (VintagestoryServer.runtimeconfig.json: tfm net10.0, Microsoft.NETCore.App 10.0.0).
          Targeting net8.0 fails with CS1705 because the game assemblies reference
          System.Runtime 10.0.0.0. Keep this in sync with Vintagestory.runtimeconfig.json's tfm. -->
@@ -83,16 +86,23 @@
   <!-- This branch is the Vintage Story 1.22 build. Compiling it against any other game version
        (e.g. the 1.23 install the VINTAGE_STORY fallback above points at on the dev machine) would
        produce a mod that compiles but patches the wrong engine, so refuse anything but 1.22.x.
-       VintagestoryLib, not VintagestoryAPI: the API dll's assembly version has lagged the game's
-       before (1.22.0 on a 1.22.5 install). -->
+       VintagestoryLib's FILE version, not an assembly version: VintagestoryAPI's file version lags
+       the game's (1.22.0 on 1.22.4+, 1.21.0 on 1.22.0), and 1.22.0's assemblies are both stamped
+       assembly version 1.0.0.0 (1.22.4+ stamp 1.22.x.0). -->
+  <UsingTask TaskName="BetterModsGetFileVersion" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <File ParameterType="System.String" Required="true" />
+      <Version ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">Version = System.Diagnostics.FileVersionInfo.GetVersionInfo(File).FileVersion ?? "";</Code>
+    </Task>
+  </UsingTask>
   <Target Name="CheckGameVersion" BeforeTargets="ResolveAssemblyReferences">
     <Error Condition="!Exists('$(VINTAGE_STORY)/VintagestoryLib.dll')" Text="No VintagestoryLib.dll under VINTAGE_STORY='$(VINTAGE_STORY)'. Point VINTAGE_STORY at a Vintage Story 1.22 install." />
-    <GetAssemblyIdentity AssemblyFiles="$(VINTAGE_STORY)/VintagestoryLib.dll">
-      <Output TaskParameter="Assemblies" ItemName="_VintagestoryLibIdentity" />
-    </GetAssemblyIdentity>
-    <PropertyGroup>
-      <_VintagestoryLibVersion>@(_VintagestoryLibIdentity->'%(Version)')</_VintagestoryLibVersion>
-    </PropertyGroup>
+    <BetterModsGetFileVersion File="$(VINTAGE_STORY)/VintagestoryLib.dll">
+      <Output TaskParameter="Version" PropertyName="_VintagestoryLibVersion" />
+    </BetterModsGetFileVersion>
     <Error Condition="!$(_VintagestoryLibVersion.StartsWith('1.22.'))" Text="VINTAGE_STORY='$(VINTAGE_STORY)' is Vintage Story $(_VintagestoryLibVersion); the 1.22.x branch only builds against 1.22.x. Point VINTAGE_STORY at a 1.22 install (or switch to main for 1.23)." />
   </Target>
 
