@@ -38,21 +38,27 @@ description. On every release, set the game version tags to the versions it actu
 ## Screenshots
 
 The images are ready in `screenshots/` (PNG, native game pixels, cropped, no edits beyond cropping;
-each well under the DB's 2 MB and 1920x1080 px limits; the hero shot is scaled 97.6% and the playstyles shot trimmed 2 px to fit 1080). The DB takes up to 12. Each `SCREENSHOT_URL_n` in
-`description.html` is one file - the number matches the file's prefix:
+each well under the DB's 2 MB and 1920x1080 px limits; the hero shot is scaled 97.6% and the playstyles shot trimmed 2 px to fit 1080). The DB takes up to 12.
 
-| File | Placeholder | Caption / what it shows |
+`description.html` already points at these files in the GitHub repo
+(`https://raw.githubusercontent.com/Seggr/BetterMods/main/docs/moddb/screenshots/<file>`), so the
+page shows them without any editing. Uploading them to the DB as well is still worthwhile: they
+fill the gallery at the top of the page, and the logo has to be one of the uploads.
+**Keep these files at these paths on `main`** - renaming or deleting one breaks its image on the
+mod page.
+
+| File | In `description.html` | Caption / what it shows |
 |---|---|---|
 | `logo-480x320.png` | - (select as **logo**) | Profile tabs (Testing / Playing / +) above four mod cards, two with update buttons. Downscaled from the hero screenshot to exactly 480x320. |
-| `01-mods-screen.png` | `SCREENSHOT_URL_1` | Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile. |
-| `02-rename-panel.png` | `SCREENSHOT_URL_2` | Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels. |
-| `03-version-dropdown.png` | `SCREENSHOT_URL_3` | Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked. |
-| `04-update-and-retracted.png` | `SCREENSHOT_URL_4` | Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted). Two crops of one screenshot stacked (the two cards between them left out). |
-| `05-tooltip.png` | `SCREENSHOT_URL_5` | Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason. |
-| `06-world-list-tooltip.png` | `SCREENSHOT_URL_6` | Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with. |
-| `07-add-shortcut.png` | `SCREENSHOT_URL_7` | BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists. |
-| `08-tooltip-update.png` | `SCREENSHOT_URL_8` | Tooltip of a mod with an update tagged for the exact game version: the green Update available line. |
-| `09-saved-playstyles.png` | `SCREENSHOT_URL_9` | Create New World with Save and Delete playstyle, and a saved custom playstyle. |
+| `01-mods-screen.png` | figure 1 | Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile. |
+| `02-rename-panel.png` | figure 2 | Right-clicking a tab opens the rename panel under it: name field, Delete, Enter saves, Esc cancels. |
+| `03-version-dropdown.png` | figure 3 | Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked. |
+| `04-update-and-retracted.png` | figure 4 | Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted). Two crops of one screenshot stacked (the two cards between them left out). |
+| `05-tooltip.png` | figure 5 | Card tooltip: name, mod id, version and side on one line; authors; description; then dependencies, an update for an older game version and the retraction reason. |
+| `06-world-list-tooltip.png` | figure 6 | Singleplayer world list: hovering a world shows, at the bottom of its tooltip, the BetterMods profile it is bound to and the mods it last loaded with. |
+| `07-add-shortcut.png` | figure 7 | BetterMods' own card with the Add Shortcut button, greyed out once the shortcut exists. |
+| `08-tooltip-update.png` | figure 8 | Tooltip of a mod with an update tagged for the exact game version: the green Update available line. |
+| `09-saved-playstyles.png` | figure 9 | Create New World with Save and Delete playstyle, and a saved custom playstyle. |
 
 **Upload order:** `logo-480x320.png` first (then select it as the logo), then `01` to `09` in file
 order, so the gallery opens on the hero shot. That is 10 of the 12 slots.
@@ -67,8 +73,8 @@ recognisable.
 
 ### Optional - add later
 
-Not captured yet. Their placeholders were removed from `description.html`; when one exists, add it
-back as `10-...png` / `SCREENSHOT_URL_10` and so on, in the section named (only two slots are left,
+Not captured yet. When one exists, commit it as `10-...png` and so on to `docs/moddb/screenshots/`,
+push it, and add a figure for it in the section named (only two slots are left,
 so pick the two that matter most):
 
 | Shot | What to capture | Section in `description.html` |
@@ -83,27 +89,12 @@ around it (no upscaling).
 
 ## Pasting the description
 
-1. Upload the screenshots first (the **Screenshots** / images section of the mod's edit page), in
-   the order above. Wait for each upload to finish.
-2. For each uploaded image, copy its address: open the image (or right-click it > **Copy image
-   address**). It will be a `https://moddbcdn.vintagestory.at/...` URL.
-3. Open `description.html` in a text editor and replace each `SCREENSHOT_URL_n` with the matching
-   address from the screenshot table. Keep the quotes: `src="https://moddbcdn.vintagestory.at/..."`.
-   Never paste an image as a `data:` URI - it counts against the 65,535-byte limit.
-4. On the mod's edit page, switch the description editor to its **source code** view (the `<>` /
+1. Push `main` to GitHub first, so every image the description links to is there.
+2. Upload the screenshots to the mod's edit page (the **Screenshots** section), logo first, and
+   select the logo. These feed the gallery and the logo; the description does not depend on them.
+3. On the edit page, switch the description editor to its **source code** view (the `<>` /
    "Source code" button in the editor toolbar).
-5. Select everything in the source view, delete it, paste the whole of `description.html`, and switch
-   back to the normal view to check it. The spoilers save collapsed, which is intended.
-6. Fill in the **Summary** (one of the options above) and the link fields, then **Save**.
-7. Open the public page and check: the callout box at the top, every image showing, each spoiler
-   opening, and the code blocks readable.
-
-Notes for later edits:
-
-- The editor strips `<script>`, `<style>` blocks, `<link>`, forms, `on*` attributes and most embeds.
-  Keep styling inline, as the file does.
-- **Do not add HTML comments** - the site turns them into visible text.
-- The file is about 46 KB (most of it inline styling); the hard limit is 65,535 bytes. Keep
-  additions modest.
-- If the editor rewrites something on save, edit `description.html` here to match so the next paste
-  does not undo it.
+4. Select everything in the source view, delete it, paste the whole of `description.html`, and switch
+   back to the normal view to check that the images load. The spoilers save collapsed, which is
+   intended. Never paste an image as a `data:` URI - it counts against the 65,535-byte limit.
+5. Fill in the **Summary** (one of the options above) and the link fields, then **Save**.
