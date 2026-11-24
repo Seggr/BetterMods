@@ -1,0 +1,15 @@
+{
+  "type": "code",
+  "modid": "bettermods",
+  "name": "BetterMods",
+  "version": "1.3.0",
+  "side": "client",
+  "requiredOnServer": false,
+  "description": "Mod profiles for the mod manager",
+  "authors": [
+    "Seggr"
+  ],
+  "dependencies": {
+    "game": "1.23.0-pre.1"
+  }
+}

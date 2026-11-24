@@ -1,0 +1,32 @@
+bin/
+obj/
+*.user
+.vs/
+docs/moddb/preview.html
+
+# Local helper scripts (not part of the public tree)
+build.ps1
+deploy.ps1
+docs/moddb/preview.ps1
+
+# Internal design notes
+docs/PROPOSAL-mod-profiles-in-core.md
+docs/DESIGN-collectible-alc.md
+NOTES-vs-internals.md
+
+# AI-assistant and editor-assistant artefacts
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+**/CLAUDE.md
+AGENTS.md
+.cursor/
+.cursorrules
+.aider*
+.copilot/
+
+# Merge leftovers
+*.orig
+
+# Release zips: published via GitHub Releases / the mod DB, not tracked
+Releases/

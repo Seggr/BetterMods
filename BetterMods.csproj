@@ -1,0 +1,92 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- The installed game (A:\Vintagestory, VintagestoryAPI 1.23.0 preview) is built against net10.0.
+         Targeting net8.0 fails with CS1705 because the game assemblies reference
+         System.Runtime 10.0.0.0. Keep this in sync with Vintagestory.runtimeconfig.json's tfm. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>BetterMods</AssemblyName>
+    <RootNamespace>BetterMods</RootNamespace>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\$(Configuration)\Mods\bettermods</OutputPath>
+    <!-- VINTAGE_STORY is normally an environment variable pointing at the game install.
+         When it is not set, fall back to this install path. -->
+    <VINTAGE_STORY Condition="'$(VINTAGE_STORY)' == ''">A:\Vintagestory</VINTAGE_STORY>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- This project sits at the repo root, so its default globs would otherwise swallow the
+         startup hook's sources (and its obj\ folder, which is not covered by the SDK's default
+         bin\/obj\ exclusions because those are relative to THIS project). BetterModsHook is built
+         as its own project and must stay out of the mod assembly. -->
+    <Compile Remove="BetterModsHook\**" />
+    <EmbeddedResource Remove="BetterModsHook\**" />
+    <None Remove="BetterModsHook\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="VintagestoryAPI">
+      <HintPath>$(VINTAGE_STORY)\VintagestoryAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="VintagestoryLib">
+      <HintPath>$(VINTAGE_STORY)\VintagestoryLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(VINTAGE_STORY)\Lib\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(VINTAGE_STORY)\Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="cairo-sharp">
+      <HintPath>$(VINTAGE_STORY)\Lib\cairo-sharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- The startup hook ships INSIDE BetterMods.dll, as an embedded resource, and the mod writes it
+       out to ModConfig\BetterMods\ itself (src\Startup\StartupHookInstaller.cs). So:
+         * the ProjectReference only orders the build - the hook must exist before this project's
+           resources are embedded. ReferenceOutputAssembly=false keeps it out of the compile
+           references, out of BetterMods.deps.json and, critically, out of this project's output
+           folder: a BetterModsHook.dll at the mod root would be LoadFrom'd by the game's mod loader
+           and, with the hook already loaded from ModConfig, fail the whole mod with
+           ModError.ChangedVersion.
+         * the path is asked of the hook project (GetTargetPath) rather than spelled out here, so it
+           follows that project's OutputPath and the configuration being built.
+       BetterMods never loads these bytes; they are only ever copied to disk. -->
+  <ItemGroup>
+    <ProjectReference Include="BetterModsHook\BetterModsHook.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="EmbedStartupHook" DependsOnTargets="ResolveProjectReferences" BeforeTargets="AssignTargetPaths">
+    <MSBuild Projects="BetterModsHook\BetterModsHook.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_BetterModsHookAssembly" />
+    </MSBuild>
+    <Error Condition="!Exists('@(_BetterModsHookAssembly)')" Text="BetterModsHook was not built: '@(_BetterModsHookAssembly)' does not exist, so it cannot be embedded." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_BetterModsHookAssembly)" LogicalName="BetterMods.Startup.BetterModsHook.dll" WithCulture="false" Type="Non-Resx" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <Content Include="modinfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Release builds map the project folder to /_/ so shipped binaries carry no local paths. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PathMap>$(MSBuildProjectDirectory)=/_/</PathMap>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>
