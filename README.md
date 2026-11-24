@@ -42,6 +42,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
   - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
 - [BetterMods](#bettermods)
   - [Contents](#contents)
+  - [Installing](#installing)
   - [Loading at startup (the startup hook)](#loading-at-startup-the-startup-hook)
     - [The easy way: Add Shortcut (Windows)](#the-easy-way-add-shortcut-windows)
     - [What the shortcut does](#what-the-shortcut-does)
@@ -67,6 +68,14 @@ update your mods from the mod DB - all inside the game's own Mods screen.
   - [Known limitations](#known-limitations)
   - [Troubleshooting and bug reports](#troubleshooting-and-bug-reports)
   - [License](#license)
+
+## Installing
+
+1. Click the one-click link thing
+2. Confirm
+3. Close the app and open using the new desktop link or what ever abortion you produce to open the game.
+   1. OR TECHNICALLY you could open a world and then exit back to the main menu... but you would still need to use the link next time, its really not that hard.
+4. Manage your mods.
 
 ## Loading at startup (the startup hook)
 
