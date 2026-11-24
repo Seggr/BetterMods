@@ -38,7 +38,7 @@ description. On every release, set the game version tags to the versions it actu
 ## Screenshots
 
 The images are ready in `screenshots/` (PNG, native game pixels, cropped, no edits beyond cropping;
-each well under the DB's 2 MB limit). The DB takes up to 12. Each `SCREENSHOT_URL_n` in
+each well under the DB's 2 MB and 1920x1080 px limits; the hero shot is scaled 97.6% and the playstyles shot trimmed 2 px to fit 1080). The DB takes up to 12. Each `SCREENSHOT_URL_n` in
 `description.html` is one file - the number matches the file's prefix:
 
 | File | Placeholder | Caption / what it shows |
