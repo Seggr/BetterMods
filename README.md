@@ -1,6 +1,10 @@
 
 
 # Lets be clear: this is a filthy Hack of a mod
+
+> **This is the `1.22.x` branch: the Vintage Story 1.22 build of BetterMods.** The Vintage Story 1.23
+> build lives on [`main`](https://github.com/Seggr/BetterMods/tree/main).
+
 This mod introduces features I believe should be stock in the game, and I hope the developers look at this and say "oh yes, he is correct; this is how it should be" and then implement everything it does. They don't even need to say thank you, I'll know ;3
 
 ## Why is this a hack? Because it requires abusing .net to do what I want
@@ -32,7 +36,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 | | |
 |---|---|
 | Side | **Client only.** Servers neither need nor see it; it works on any server. |
-| Game version | **Vintage Story 1.23.0-pre.1 or newer** (1.23.x). For 1.22, use the BetterMods 1.2.1 release. |
+| Game version | **Vintage Story 1.22.7** (1.22.x). For 1.23, use the build from the `main` branch. |
 | Open it | Main menu: **Mods** screen. In game: the **Mod Profiles** dialog - bind a key to it under **Settings > Controls** (none by default). |
 | Restart needed? | Only when a profile switches a mod you already used this session to a *different version*. Enabling and disabling mods never needs one. |
 
@@ -251,7 +255,7 @@ on top, a status line only when there is a load error, and a row of buttons at t
 - **`(Retracted)`** in yellow: the release you have installed was retracted on the mod DB. The
   tooltip gives the DB's reason.
 - **Buttons**, as they apply: **Add Shortcut** (BetterMods' own card only), **Fix dependencies**,
-  **Open mod page**, and **Update to x.y.z** (a yellow **Update to x.y.z (1.22)** for a release made
+  **Open mod page**, and **Update to x.y.z** (a yellow **Update to x.y.z (1.22.6)** for a release made
   for an older game version). On a narrow window the mod page button goes first; the update button
   always stays.
 
@@ -282,19 +286,19 @@ background: once per session, the first time you open the Mods screen or the in-
 again when you press **Reload Mods** or the status button. It never checks on a timer.
 
 - **Exact game version only.** An update is offered only when the mod DB has a newer release
-  **tagged for the exact game version you are running** (for example `1.23.0-pre.1`). It never moves
+  **tagged for the exact game version you are running** (for example `1.22.7`). It never moves
   a stable release onto a pre-release.
 - **Releases for an older game version.** If a mod has nothing for your version, BetterMods also
-  looks at the newest stable game version before yours (for example 1.22.7). Such a release gets a
-  yellow **Update to x.y.z (1.22)** button and an "untested" note in the tooltip. Clicking it
+  looks at the newest stable game version before yours (for example 1.22.6). Such a release gets a
+  yellow **Update to x.y.z (1.22.6)** button and an "untested" note in the tooltip. Clicking it
   **asks you first**, and it is **not included in Update all**.
 
   ![Yellow update markers with Update to buttons: updates for an older game version show (1.22), an exact-version update does not, and a retracted release shows (Retracted)](docs/moddb/screenshots/04-update-and-retracted.png)
 
 - **Status line** (on the "Installed mods" heading): "Checking for updates...", "N updates
-  available" with an **Update all** button, "1 update only for game 1.22.7 - confirm on the card",
-  "Update check failed" with **Retry**, or **"No newer releases for 1.23.0-pre.1"**. Few mods are
-  tagged for a preview build yet, so BetterMods never claims you are "up to date".
+  available" with an **Update all** button, "1 update only for game 1.22.6 - confirm on the card",
+  "Update check failed" with **Retry**, or **"No newer releases for 1.22.7"**. Many mods are not
+  tagged for every game version, so BetterMods never claims you are "up to date".
 - **Not checked:** the game's own core mods, BetterMods itself, mods whose `modinfo.json` failed to
   load, and anything inside the game's install folder.
 
@@ -352,7 +356,7 @@ download, or (in game) a dependency that has to be downloaded - is listed in the
 card's tooltip and the log. Nothing is half-done silently.
 
 It does **not** fix requirements on the game itself (`game`, `survival`, `creative` or other core
-mods). Those are shown in the tooltip - for example "this game provides 1.23.0-pre.1 (cannot be
+mods). Those are shown in the tooltip - for example "this game provides 1.22.7 (cannot be
 fixed here)", or a core mod switched off in this profile - and left to you.
 
 ### Core-mod protection
@@ -597,7 +601,7 @@ Common questions:
   warning above) and use the shortcut instead.
 - *"Restart needed - version changed"?* You picked a different version of a mod you already played
   with this session. Restart the game, or pick the version you were using.
-- *"No newer releases for 1.23.0-pre.1"?* That is not "up to date": no release on the mod DB is
+- *"No newer releases for 1.22.7"?* That is not "up to date": no release on the mod DB is
   tagged for your exact game version.
 
 ## Releases
