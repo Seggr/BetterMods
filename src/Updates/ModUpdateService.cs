@@ -210,10 +210,32 @@ namespace BetterMods.Updates
         public static string OlderGameVersion { get; private set; }
 
         /// <summary>
-        /// The game version the DB is asked about - what the <c>game</c> core mod reports, which on the
-        /// 1.23 preview is <c>1.23.0-pre.1</c> and has almost nothing tagged for it yet.
+        /// The game version the DB is asked about - what the <c>game</c> core mod reports, i.e. the
+        /// RUNNING game's <c>GameVersion.ShortGameVersion</c> (on the 1.23 preview <c>1.23.0-pre.1</c>,
+        /// which has almost nothing tagged for it yet). That is a <c>const</c>: naming it in code bakes
+        /// in the version this build was compiled against (a build against <c>1.23.0-pre.1</c> would
+        /// keep saying so on every later 1.23 release; the 1.22 build compiles against the oldest 1.22.x
+        /// it supports), so the value is read from the loaded VintagestoryAPI's metadata instead.
+        /// Every BetterMods use of "the game version" goes through here.
         /// </summary>
-        public static string GameVersionChecked => GameVersion.ShortGameVersion;
+        public static string GameVersionChecked { get; } = ReadRunningGameVersion();
+
+        private static string ReadRunningGameVersion()
+        {
+            try
+            {
+                if (typeof(GameVersion).GetField(nameof(GameVersion.ShortGameVersion))?.GetRawConstantValue() is string running
+                    && !string.IsNullOrEmpty(running))
+                {
+                    return running;
+                }
+            }
+            catch (Exception e)
+            {
+                BetterModsModSystem.Logger?.Error("[BetterMods] Could not read the running game version; using the compile-time one: " + e.Message);
+            }
+            return GameVersion.ShortGameVersion;
+        }
 
         private static bool menuReloadPending;
 

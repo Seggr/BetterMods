@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using BetterMods.Gui;
+using BetterMods.Updates;
 using Cairo;
 using HarmonyLib;
 using Vintagestory.API.Client;
@@ -532,7 +533,7 @@ namespace BetterMods.Patches
                     if (Array.IndexOf(BaseGameModIds, dependency.ModID) < 0) continue;
                     if (GameVersion.IsCompatibleApiVersion(dependency.Version)) continue;
 
-                    ModCardContent.AppendTooltipWarning(__instance.cell, Lang.Get("mod-versionmismatch", dependency.Version, GameVersion.ShortGameVersion));
+                    ModCardContent.AppendTooltipWarning(__instance.cell, Lang.Get("mod-versionmismatch", dependency.Version, ModUpdateService.GameVersionChecked));
                 }
             }
             catch (Exception e)

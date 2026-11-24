@@ -30,7 +30,7 @@ namespace BetterMods.Updates
         public List<DependencyIssue> IssuesFor(ModVersionGroup group)
         {
             if (string.IsNullOrEmpty(group?.ModId) || !mods.TryGetValue(group.ModId, out DepMod mod)) return new List<DependencyIssue>();
-            return DependencyRules.Issues(mod, mods, GameVersion.ShortGameVersion);
+            return DependencyRules.Issues(mod, mods, ModUpdateService.GameVersionChecked);
         }
     }
 
@@ -259,7 +259,7 @@ namespace BetterMods.Updates
                 return;
             }
 
-            DependencyPlan plan = DependencyRules.Plan(run.RootModId, mods, GameVersion.ShortGameVersion);
+            DependencyPlan plan = DependencyRules.Plan(run.RootModId, mods, ModUpdateService.GameVersionChecked);
 
             foreach (string note in plan.Notes)
             {
