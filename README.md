@@ -1,9 +1,9 @@
 
 
-# Lets be clear this is a filthy Hack of a mod
-This mod introduces features I believe should be stock in the game and I hope the developers look at this and say "oh yes he is correct this is how it should be" and then impliment everything it does, they don't even need to say thank you, I'll know ;3
+# Lets be clear: this is a filthy Hack of a mod
+This mod introduces features I believe should be stock in the game, and I hope the developers look at this and say "oh yes, he is correct; this is how it should be" and then implement everything it does. They don't even need to say thank you, I'll know ;3
 
-## Why is this a hack? becauase it requires abusing .net to do what I want
+## Why is this a hack? Because it requires abusing .net to do what I want
 
 Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on
 a normal launch the Mods screen stays vanilla until you have loaded a world once that session.
@@ -38,8 +38,8 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 
 ## Contents
 
-- [Lets be clear this is a filthy Hack of a mod](#lets-be-clear-this-is-a-filthy-hack-of-a-mod)
-  - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
+- [Lets be clear: this is a filthy Hack of a mod](#lets-be-clear-this-is-a-filthy-hack-of-a-mod)
+  - [Why is this a hack? Because it requires abusing .net to do what I want](#why-is-this-a-hack-because-it-requires-abusing-net-to-do-what-i-want)
 - [BetterMods](#bettermods)
   - [Contents](#contents)
   - [Installing](#installing)
@@ -82,7 +82,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 
 ## Loading at startup (the startup hook)
 
-Why this is needed: see [Why is this a hack?](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want).
+Why this is needed: see [Why is this a hack?](#why-is-this-a-hack-because-it-requires-abusing-net-to-do-what-i-want).
 
 ### The easy way: Add Shortcut (Windows)
 
@@ -299,6 +299,7 @@ again when you press **Reload Mods** or the status button. It never checks on a 
   load, and anything inside the game's install folder.
 
 ![Tooltip of a mod with an update tagged for the exact game version: the green Update available line](docs/moddb/screenshots/08-tooltip-update.png)
+*(Also Bannta you should go lookup what Semver is and what the numbers mean)*
 
 **Installing** happens only when you click **Update to ...** or **Update all**, and only on the main
 menu:
@@ -400,7 +401,7 @@ offered the switch.
 ## Saved playstyles (Accepted feature creep)
 
 > **Accepted feature creep.** This has nothing to do with mod profiles. It lives in BetterMods
-> because I'm lazy and a separate mod just for two buttons on one screen was not worth it.
+> because I'm lazy, and a separate mod just for two buttons on one screen was not worth it.
 
 On **Create New World**, the **Select A Playstyle** row gets two buttons at its right end:
 **Save playstyle** and **Delete playstyle** (just **Save** and **Delete** when the window is narrow).
