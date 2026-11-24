@@ -298,6 +298,8 @@ again when you press **Reload Mods** or the status button. It never checks on a 
 - **Not checked:** the game's own core mods, BetterMods itself, mods whose `modinfo.json` failed to
   load, and anything inside the game's install folder.
 
+![Tooltip of a mod with an update tagged for the exact game version: the green Update available line](docs/moddb/screenshots/08-tooltip-update.png)
+
 **Installing** happens only when you click **Update to ...** or **Update all**, and only on the main
 menu:
 
@@ -321,7 +323,8 @@ BECUASE I DON'T WANT TO HIT CONFIRM EVERY TIME
 
 **Open mod page** appears on the cards of mods the update check found on the mod DB. It looks up the
 page (once per mod per session) and opens it in your browser. The first time, BetterMods asks:
-**Cancel**, **Always trust mods.vintagestory.at**, or **Open**.
+**Cancel**, **Always trust mods.vintagestory.at**, or **Open**. Trust applies only to the mod page
+links BetterMods builds itself; every other link keeps the game's normal confirmation.
 
 To undo "Always trust", close the game and remove the site from the `"TrustedLinkHosts"` list in
 `%APPDATA%\VintagestoryData\ModConfig\bettermods.json` (or remove the whole entry). There is no

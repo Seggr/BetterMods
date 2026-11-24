@@ -18,10 +18,16 @@
 </div>
 <h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Installing</h2>
 <ol style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
-<li style="margin: 6px 0;">Download the zip from the <strong>Files</strong> tab (1.23: the latest; 1.22: BetterMods 1.2.0).</li>
-<li style="margin: 6px 0;">Drop it into your Mods folder <strong>without unzipping</strong> (Windows: <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\VintagestoryData\Mods\</code> - the <strong>Open Mods Folder</strong> button gets you there).</li>
-<li style="margin: 6px 0;">Start the game and load any world once. Then, on <strong>BetterMods' own card</strong> in the mod list, click <strong>Add Shortcut</strong> and start the game from that shortcut from now on, so the tabs are there from the first screen (see <strong>Load at startup</strong> below).</li>
-<li style="margin: 6px 0;">For the in-game dialog, bind a key to <strong>Mod Profiles</strong> under <strong>Settings &gt; Controls</strong> (none by default).</li>
+<li style="margin: 6px 0;">Click the one-click link thing</li>
+<li style="margin: 6px 0;">Confirm</li>
+<li style="margin: 6px 0;">Open a world, then exit back to the main menu. BetterMods can't do anything until a world has loaded once - that's the hack.</li>
+<li style="margin: 6px 0;">In <strong>Mods</strong>, click <strong>Add Shortcut</strong> on BetterMods' own card (Windows; on Linux/macOS see <a href="https://github.com/Seggr/BetterMods#linux-and-macos">Linux and macOS</a>).</li>
+<li style="margin: 6px 0;">Close the app and open using the new desktop link or whatever abortion you produce to open the game.
+<ol style="line-height: 1.6; padding-left: 22px; margin: 0;">
+<li style="margin: 6px 0;">OR TECHNICALLY you don't have to restart right now - after step 3 the menu already works for the rest of this session... but you would still need to use the link next time, it's really not that hard.</li>
+</ol>
+</li>
+<li style="margin: 6px 0;">Manage your mods.</li>
 </ol>
 <h2 style="margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid #e4dccb; color: #3a342c;">Features</h2>
 <ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
@@ -50,7 +56,7 @@
 <ul style="line-height: 1.6; padding-left: 22px; margin: 8px 0;">
 <li style="margin: 6px 0;"><strong>For that launch only:</strong> the shortcut sets <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> just for the game it starts, and only if the hook file exists - delete the file and it still starts a normal game.</li>
 <li style="margin: 6px 0;"><strong>Nothing to copy by hand:</strong> BetterMods writes the hook to <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">ModConfig\BetterMods\BetterModsHook.dll</code> and keeps it matching the installed version, even after updates.</li>
-<li style="margin: 6px 0;">The button greys out once the shortcut exists. Starting the game any other way gives the normal behaviour.</li>
+<li style="margin: 6px 0;">The button greys out once the shortcut exists - hover the card to see which shortcut it found. If creating it fails, the Mods screen says "Add Shortcut failed" and the card's tooltip gives the reason. Starting the game any other way gives the normal behaviour.</li>
 <li style="margin: 6px 0;"><strong>Off means off:</strong> switch BetterMods off in the mod manager and the hook does nothing either, from the next launch.</li>
 </ul>
 <div style="background: #fff4ec; border: 1px solid #efc9b4; border-left: 5px solid #c2562f; border-radius: 8px; padding: 12px 16px; margin: 14px 0;">
@@ -90,6 +96,7 @@
 set "HOOK=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll"
 if exist "%HOOK%" set "DOTNET_STARTUP_HOOKS=%HOOK%"
 start "" "GAMEFOLDER\Vintagestory.exe"</pre>
+<p>The hook file only exists after BetterMods has run once, so load a world once first.</p>
 </div>
 </div>
 <div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
@@ -301,11 +308,11 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 </tr>
 <tr>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">First open of the Mods screen or dialog per session; Reload Mods; the status button</td>
-<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Your game version and the ids and versions of your installed mods (core mods and BetterMods excluded)</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Your game version and the ids and versions of your installed mods (core mods and BetterMods excluded), plus the DB's list of game versions</td>
 </tr>
 <tr>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Open mod page</td>
-<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">One lookup of that mod's page address</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">One lookup of that mod's page address (cached for the session)</td>
 </tr>
 <tr>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Update, Update all, Fix dependencies</td>
@@ -313,19 +320,20 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 </tr>
 </tbody>
 </table>
-<p style="line-height: 1.6; margin: 8px 0;">Nothing else: no telemetry, no other sites.</p>
+<p style="line-height: 1.6; margin: 8px 0;">Nothing else: no telemetry, no other sites. Opening a mod page hands the address to your browser.</p>
 <div class="spoiler" style="margin: 18px 0; border: 1px solid #d7cfbf; border-radius: 10px; overflow: hidden; background: #faf7f0;">
 <div class="spoiler-toggle" style="padding: 12px 16px; background: linear-gradient(180deg,#e7dece 0%,#ddd2be 100%); font-weight: bold; cursor: pointer;">Known limitations and FAQ</div>
 <div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <ul>
 <li style="margin: 6px 0;"><strong>No tabs on the main menu?</strong> Load a world once, or use Add Shortcut. With the hook, check <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\bettermods-hook.log</code>.</li>
-<li style="margin: 6px 0;"><strong>Zip install + hook:</strong> the first launch after installing or updating BetterMods is vanilla until a world loads (the game only unpacks zips then).</li>
+<li style="margin: 6px 0;"><strong>Zip install + hook:</strong> the first launch after installing or updating BetterMods is vanilla until a world loads (the game only unpacks zips then). Folder installs have no gap.</li>
 <li style="margin: 6px 0;"><strong>"Restart needed - version changed"?</strong> You picked another version of a mod you already played with this session. Restart, or pick the version you were using.</li>
 <li style="margin: 6px 0;"><strong>"No newer releases for 1.23.0-pre.1"?</strong> Not "up to date" - nothing on the DB is tagged for your exact version yet.</li>
 <li style="margin: 6px 0;"><strong>Applied a profile in game and nothing changed?</strong> It takes effect at the next world load.</li>
-<li style="margin: 6px 0;"><strong>A mod I added by hand is on in every profile.</strong> Profiles record what is off, so new mods start on everywhere. Updates BetterMods installs itself only go to the viewed profile.</li>
+<li style="margin: 6px 0;"><strong>A mod I added by hand is on in every profile.</strong> Profiles record what is off, so new mods start on everywhere, and a profile that had an older version of it on moves to the newest. Updates and dependencies BetterMods installs itself only go to the viewed profile.</li>
 <li style="margin: 6px 0;"><strong>A mod copied in while the game runs is missing.</strong> Press Reload Mods, as in vanilla.</li>
 <li style="margin: 6px 0;"><strong>Odd characters show as ?</strong> - the card font is ASCII-only.</li>
+<li style="margin: 6px 0;"><strong>Windows-only shortcut.</strong> On Linux and macOS you add the launch command yourself. The shortcut also cannot be made if a path contains <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%</code> or <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">"</code>.</li>
 <li style="margin: 6px 0;"><strong>Saved playstyles based on Creative Building</strong> are not treated as creative by the game's new-world checks, and Customize caps the height at 512. The world is still created as Creative Building.</li>
 <li style="margin: 6px 0;"><strong>The game will not start after setting <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">DOTNET_STARTUP_HOOKS</code> myself.</strong> Remove the variable and use the shortcut instead.</li>
 <li style="margin: 6px 0;">BetterMods patches the vanilla Mods screen; another mod changing the same screen may conflict.</li>
