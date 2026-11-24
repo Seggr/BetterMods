@@ -1,13 +1,9 @@
-# BetterMods
 
-Mod **profiles** for Vintage Story's mod manager + custom "Playstyles". Keep named sets of enabled and disabled mods,
-switch between them with one click, pick which installed version of a mod each profile uses, and
-update your mods from the mod DB - all inside the game's own Mods screen.
 
-## Lets be clear this is a filthy Hack of a mod
+# Lets be clear this is a filthy Hack of a mod
 This mod introduces features I believe should be stock in the game and I hope the developers look at this and say "oh yes he is correct this is how it should be" and then impliment everything it does, they don't even need to say thank you, I'll know ;3
 
-### Why is this a hack? becauase it requires abusing .net to do what I want
+## Why is this a hack? becauase it requires abusing .net to do what I want
 
 Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on
 a normal launch the Mods screen stays vanilla until you have loaded a world once that session.
@@ -16,6 +12,20 @@ The fix is a small **.NET startup hook**, `BetterModsHook.dll`, which the .NET r
 before the game starts. It waits for the game to finish starting, then loads BetterMods' patches,
 so the profile tabs are there from the very first screen. It does nothing else, and it changes
 nothing once a world is loaded.
+
+The catch: .NET only runs a startup hook when the `DOTNET_STARTUP_HOOKS` environment variable names
+it, and a mod has no way to set that for the game. So BetterMods makes a **custom desktop shortcut**,
+*Vintage Story (BetterMods)*, from the **Add Shortcut** button on its own mod card. The shortcut sets
+that variable for that one launch only - and only if the hook file is actually there - then starts
+the game. Launch from the shortcut and the hook runs; launch the game normally and everything stays
+vanilla until a world loads. Nothing on your system is changed globally. See
+[Loading at startup](#loading-at-startup-the-startup-hook).
+
+# BetterMods
+
+Mod **profiles** for Vintage Story's mod manager + custom "Playstyles". Keep named sets of enabled and disabled mods,
+switch between them with one click, pick which installed version of a mod each profile uses, and
+update your mods from the mod DB - all inside the game's own Mods screen.
 
 ![Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile](docs/moddb/screenshots/01-mods-screen.png)
 
@@ -28,9 +38,9 @@ nothing once a world is loaded.
 
 ## Contents
 
+- [Lets be clear this is a filthy Hack of a mod](#lets-be-clear-this-is-a-filthy-hack-of-a-mod)
+  - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
 - [BetterMods](#bettermods)
-  - [Lets be clear this is a filthy Hack of a mod](#lets-be-clear-this-is-a-filthy-hack-of-a-mod)
-    - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
   - [Contents](#contents)
   - [Profiles](#profiles)
   - [The in-game Mod Profiles dialog](#the-in-game-mod-profiles-dialog)
