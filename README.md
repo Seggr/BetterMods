@@ -73,9 +73,11 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 
 1. Click the one-click link thing
 2. Confirm
-3. Close the app and open using the new desktop link or what ever abortion you produce to open the game.
-   1. OR TECHNICALLY you could open a world and then exit back to the main menu... but you would still need to use the link next time, its really not that hard.
-4. Manage your mods.
+3. Open a world, then exit back to the main menu. BetterMods can't do anything until a world has loaded once - that's the hack.
+4. In **Mods**, click **Add Shortcut** on BetterMods' own card (Windows; on Linux/macOS see [Linux and macOS](#linux-and-macos)).
+5. Close the app and open using the new desktop link or whatever abortion you produce to open the game.
+   1. OR TECHNICALLY you don't have to restart right now - after step 3 the menu already works for the rest of this session... but you would still need to use the link next time, it's really not that hard.
+6. Manage your mods.
 
 ## Loading at startup (the startup hook)
 
