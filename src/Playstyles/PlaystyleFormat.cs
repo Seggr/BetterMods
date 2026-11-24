@@ -348,19 +348,29 @@ namespace BetterMods.Playstyles
 
         /// <summary>
         /// The world height a preset actually gets: the requested one (256 when absent) made a valid
-        /// map size by vanilla's own <c>WorldConfig.ClampToValidMapSize</c>, then clamped and snapped
-        /// to the customize screen's slider (128-512 in steps of 64; 128-2048 for creativebuilding).
+        /// map size the way 1.23's <c>WorldConfig.ClampToValidMapSize</c> does (1.22 has no such
+        /// method; see <see cref="ClampToValidMapSize"/>), then clamped and snapped to the customize
+        /// screen's slider (128-512 in steps of 64; 128-2048 for creativebuilding).
         /// </summary>
         public static int EffectiveWorldHeight(int? requested, string baseCode)
         {
             int max = baseCode == "creativebuilding" ? MaxCreativeWorldHeight : MaxWorldHeight;
             int height = requested ?? DefaultWorldHeight;
 
-            height = WorldConfig.ClampToValidMapSize(height, max);
+            height = ClampToValidMapSize(height, max);
             height = Math.Clamp(height, MinWorldHeight, max);
             height = MinWorldHeight + (int)Math.Round((height - MinWorldHeight) / (double)WorldHeightStep, MidpointRounding.AwayFromZero) * WorldHeightStep;
 
             return Math.Clamp(height, MinWorldHeight, max);
+        }
+
+        /// <summary>
+        /// A copy of 1.23's <c>WorldConfig.ClampToValidMapSize</c> (clamp to 32..max, round up to a
+        /// multiple of 32), which 1.22 does not have.
+        /// </summary>
+        private static int ClampToValidMapSize(int mapSize, int maxSize)
+        {
+            return (Math.Clamp(mapSize, 32, maxSize) + 32 - 1) / 32 * 32;
         }
 
         // ---------------------------------------------------------------- writing

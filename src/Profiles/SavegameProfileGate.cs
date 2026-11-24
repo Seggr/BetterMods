@@ -247,8 +247,8 @@ namespace BetterMods.Profiles
                     worldList = null;
                 }
 
-                // A list recorded on 1.22 can name server-only mods, which 1.23's client never loads
-                // and EnabledKeys therefore never predicts. See ProfileMatcher.ClientLoadable.
+                // Drops mods the client loader never loads and EnabledKeys therefore never predicts
+                // - none on 1.22, which has no side filter. See ProfileMatcher.ClientLoadable.
                 worldList = ProfileMatcher.ClientLoadable(worldList, installed);
             }
 
@@ -582,9 +582,9 @@ namespace BetterMods.Profiles
 
                 if (previous != null && loaded != null)
                 {
-                    // A record from 1.22 can name server-only mods, which 1.23's client loader never
-                    // loads and so never captures; they are not missing. Without a readable installed
-                    // list there is nothing to filter by, and the raw comparison is the old behaviour.
+                    // Mods the client loader never loads are never captured, so they are not missing
+                    // (none on 1.22, which has no side filter - see ProfileMatcher.ClientLoadable).
+                    // Without a readable installed list the raw comparison is the old behaviour.
                     List<ModContainer> installed = InstalledModScanner.MenuMods(ClientProgram.screenManager, out bool reliable);
                     if (reliable) previous = ProfileMatcher.ClientLoadable(previous, installed);
 

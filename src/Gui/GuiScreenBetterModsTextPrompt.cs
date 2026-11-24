@@ -74,7 +74,7 @@ namespace BetterMods.Gui
 
             ShowMainMenu = false;
 
-            int windowWidth = screenManager.GamePlatform.FramebufferSize.Width;
+            int windowWidth = screenManager.GamePlatform.WindowSize.Width;
             double guiScale = RuntimeEnv.GUIScale;
             if (!(guiScale > 0.01)) guiScale = 1.0;
 

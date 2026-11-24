@@ -545,7 +545,7 @@ namespace BetterMods.Gui
                 if (backgroundBounds == null || backgroundBounds == composer.Bounds) return;
                 if (backgroundBounds.horizontalSizing != ElementSizing.Fixed || contentBounds.horizontalSizing != ElementSizing.Fixed) return;
 
-                double windowWidth = screen.ScreenManager.GamePlatform.FramebufferSize.Width;
+                double windowWidth = screen.ScreenManager.GamePlatform.WindowSize.Width;
                 double available = MenuLayout.AvailableWidthPx(screen, windowWidth);
 
                 double excess = (composer.Bounds.OuterWidth - available) / guiScale;

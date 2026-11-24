@@ -29,10 +29,10 @@ using SurfaceDrawImage = Vintagestory.API.Common.SurfaceDrawImage;
 //
 //   - the conv.i4 that ends the icon size expression becomes a call to ModIconGate.IconSize, which
 //     returns the fixed, GUI-scaled box (Compose and UpdateCellHeight);
-//   - the call SurfaceDrawImage.Image(ImageSurface, BitmapExternal, int, int, int, int) becomes a
+//   - the call SurfaceDrawImage.Image(ImageSurface, BitmapRef, int, int, int, int) becomes a
 //     call to ModIconGate.DrawIcon, same signature, which letterboxes instead of stretching. Matched
-//     by the FULL parameter list, not by name: 1.23 added that BitmapExternal overload next to the
-//     now-obsolete BitmapRef one, and a call whose operand changes signature is invalid IL;
+//     by the FULL parameter list, not by name: 1.22 has only that BitmapRef overload, but 1.23 adds
+//     a BitmapExternal one next to it, and a call whose operand changes signature is invalid IL;
 //   - each of Compose's three text draws - this.textUtil.AutobreakAndDrawMultilineTextAt(...) for
 //     the title, the detail text and the version - loses its "ldfld textUtil" (now a nop, so the
 //     receiver left on the stack is the cell itself) and has its callvirt turned into a static call
@@ -122,8 +122,9 @@ namespace BetterMods.Patches
         }
 
         /// <summary>
-        /// Replaces the <c>SurfaceDrawImage.Image(ImageSurface, BitmapExternal, int, int, int, int)</c>
-        /// call. Disabled, it IS that call - the argument evaluation vanilla emitted is untouched, so
+        /// Replaces the <c>SurfaceDrawImage.Image(ImageSurface, BitmapRef, int, int, int, int)</c>
+        /// call (the only overload on 1.22; <c>Compose</c> passes <c>Mod.Icon</c>, a
+        /// <c>BitmapExternal</c>, through it). Disabled, it IS that call - the argument evaluation vanilla emitted is untouched, so
         /// forwarding it reproduces vanilla exactly.
         /// <para>
         /// The parameter list has to stay identical to that overload's:
@@ -131,7 +132,7 @@ namespace BetterMods.Patches
         /// unless they agree.
         /// </para>
         /// </summary>
-        public static void DrawIcon(ImageSurface surface, BitmapExternal bmp, int xPos, int yPos, int width, int height)
+        public static void DrawIcon(ImageSurface surface, BitmapRef bmp, int xPos, int yPos, int width, int height)
         {
             if (Enabled)
             {
@@ -243,9 +244,9 @@ namespace BetterMods.Patches
         /// Which is only valid while the two methods take exactly the same arguments, so the call is
         /// matched on its whole shape - static, <c>void</c>, and a parameter list type-for-type equal
         /// to <see cref="ModIconGate.DrawIcon"/>'s - not on its name. <c>SurfaceDrawImage.Image</c>
-        /// has two overloads on 1.23 (<c>BitmapRef</c>, obsolete, and <c>BitmapExternal</c>, which is
-        /// what <c>Compose</c> calls); a name match would happily swap one for a replacement shaped
-        /// like the other. Exactly one such call is expected - more than one and this is not the
+        /// has one overload on 1.22 (<c>BitmapRef</c>, which is what <c>Compose</c> calls) but two on
+        /// 1.23 (plus <c>BitmapExternal</c>); a name match would happily swap one for a replacement
+        /// shaped like the other. Exactly one such call is expected - more than one and this is not the
         /// method it was written against, so nothing is touched and the row stays vanilla.
         /// </para>
         /// </summary>
@@ -348,7 +349,7 @@ namespace BetterMods.Patches
         public static void ReportMiss(string methodName, string what)
         {
             BetterModsModSystem.Logger?.Warning(
-                "[BetterMods] GuiElementModCell." + methodName + " does not look like it did in 1.23.0 (" + what
+                "[BetterMods] GuiElementModCell." + methodName + " does not look like it did in 1.22.7 (" + what
                 + " not found); the mod rows stay vanilla.");
         }
     }
@@ -358,8 +359,8 @@ namespace BetterMods.Patches
     /// <para>
     /// Each is <c>this.textUtil.AutobreakAndDrawMultilineTextAt(ctx, font, text, x, y, width,
     /// orientation)</c>, i.e. <c>ldarg.0; ldfld textUtil; ...args...; callvirt</c> (verified in the
-    /// live 1.23.0 IL: <c>IL_017b/017c ... IL_01bb</c> title, <c>IL_01d6/01d7 ... IL_0229</c> detail,
-    /// <c>IL_0257/0258 ... IL_02ce</c> version). Turning the <c>ldfld</c> into a <c>nop</c> leaves
+    /// live 1.22.7 IL, same offsets as 1.23.0: <c>IL_017b/017c ... IL_01bb</c> title,
+    /// <c>IL_01d6/01d7 ... IL_0229</c> detail, <c>IL_0257/0258 ... IL_02ce</c> version). Turning the <c>ldfld</c> into a <c>nop</c> leaves
     /// the cell itself where the receiver was, and turning the <c>callvirt</c> into a <c>call</c> to a
     /// static that takes the cell first and the same arguments after is then stack- and type-neutral.
     /// The return value (stored as <c>titleTextheight</c>, or popped) is preserved.
@@ -484,7 +485,7 @@ namespace BetterMods.Patches
     /// <c>warningTextTexture</c> for a mod that depends on <c>game</c>/<c>creative</c>/<c>survival</c>
     /// at an incompatible major.minor, and <c>OnRenderInteractiveElements</c> draws that texture at
     /// the mouse whenever the cell is hovered - exactly where the card tooltip appears, so the two
-    /// would overprint. On the 1.23 preview that is most 1.22-era mods. With the card on, the
+    /// would overprint. On a new minor version that is most mods made for the previous one. With the card on, the
     /// texture is disposed and nulled (vanilla null-checks it on both the render and the dispose
     /// path), and the same sentence goes into the tooltip instead. The warning ICON on the card is
     /// untouched. Without the card - or without the field on some build - vanilla is left alone.
@@ -523,7 +524,7 @@ namespace BetterMods.Patches
                 WarningTextTexture(__instance) = null;
                 texture.Dispose();
 
-                // The same test and sentence the constructor used (GuiElementModCell.cs:61-76, 1.23).
+                // The same test and sentence the constructor used (GuiElementModCell.cs:61-76, 1.22.7 and 1.23).
                 ModContainer mod = __instance.cell?.Mod;
                 if (mod?.Info?.Dependencies == null || !mod.Enabled) return;
 

@@ -117,17 +117,22 @@ namespace BetterMods.Profiles
         /// <summary>
         /// Whether the client's mod loader will load this mod at all.
         /// <para>
-        /// New in 1.23: <c>ModLoader.LoadMods</c> switches off every enabled mod whose
-        /// <c>ModInfo.Side</c> does not include the loading side, before anything is unpacked or
-        /// instantiated. So a <c>"side": "server"</c> mod is no longer in the client's
-        /// <c>IModLoader.Mods</c>, and a world's recorded mod list never contains one. Anything that
-        /// predicts what the client will load has to apply the same filter, or every profile holding
-        /// a server-only mod reads as "one extra mod" and never matches a world exactly.
+        /// On 1.22 that is every mod with a <c>ModInfo</c>: 1.22's <c>ModLoader.LoadMods</c> has no
+        /// side filter (verified on the 1.22.7 dll), so a <c>"side": "server"</c> mod stays enabled in
+        /// the client's <c>IModLoader.Mods</c> - only its systems skip <c>StartClientSide</c> - and a
+        /// world's recorded mod list contains it. The prediction must include it too, or a profile
+        /// holding a server-only mod never matches a world exactly.
+        /// </para>
+        /// <para>
+        /// 1.23 switches such mods off at load (<c>"Mod {0} is disabled because it is not compatible
+        /// with the current side"</c>); the 1.23 build of BetterMods tests <c>ModInfo.Side</c> here.
+        /// With this returning true for every mod, <see cref="ServerOnlyModIds"/> is always empty and
+        /// <c>ProfileMatcher.ClientLoadable</c> passes lists through unchanged.
         /// </para>
         /// </summary>
         public static bool LoadsClientSide(ModInfo info)
         {
-            return info != null && (info.Side & EnumAppSide.Client) != 0;
+            return info != null;
         }
 
         /// <summary>

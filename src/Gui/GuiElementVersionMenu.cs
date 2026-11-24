@@ -803,11 +803,9 @@ namespace BetterMods.Gui
 
             args.SetHandled();
 
-            // One row per whole notch. DeltaYInt is the engine's accumulated integer delta - what
-            // vanilla's discrete steppers (GuiElementDropDown, GuiElementSlider, the hotbar) read -
-            // so a fractional trackpad delta adds up to a step instead of stepping on every event.
-            // For a wheel it equals the old (int)-truncated deltaPrecise, sign included.
-            if (CanScroll && args.DeltaYInt != 0) SetFirstVisible(firstVisible - Math.Sign(args.DeltaYInt));
+            // One row per notch. On 1.22 deltaPrecise is the (int)-truncated wheel delta (1.22 has
+            // no DeltaYInt), so a zero delta - a sub-notch trackpad event - steps nothing.
+            if (CanScroll && args.deltaPrecise != 0f) SetFirstVisible(firstVisible - Math.Sign(args.deltaPrecise));
         }
 
         /// <summary>

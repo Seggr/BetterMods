@@ -173,6 +173,9 @@ namespace BetterMods.Updates
         /// </summary>
         public static event Action Changed;
 
+        /// <summary>How many downloads run at once (1.23's <c>MaxParallelModDownloads</c> default; 1.22 has no such setting).</summary>
+        private const int DefaultParallelDownloads = 3;
+
         private static readonly Dictionary<string, ModDbRecord> Records = new Dictionary<string, ModDbRecord>(StringComparer.OrdinalIgnoreCase);
         private static readonly HashSet<string> Installing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, string> InstallErrors = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -860,7 +863,8 @@ namespace BetterMods.Updates
 
             string modDbUrl = ClientSettings.ModDbUrl;
             string modsFolder = GamePaths.DataPathMods;
-            int parallel = Math.Clamp(ClientSettings.MaxParallelModDownloads, 1, 6);
+            // 1.22 has no ClientSettings.MaxParallelModDownloads; 3 is that setting's default on 1.23.
+            int parallel = DefaultParallelDownloads;
 
             Task.Run(() => RunInstallAsync(jobs, modDbUrl, modsFolder, parallel, viewedProfileId))
                 .ContinueWith(task => Post(() => FinishInstall(jobs, task, onFinished)), TaskScheduler.Default);

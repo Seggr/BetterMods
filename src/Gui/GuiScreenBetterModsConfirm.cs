@@ -98,8 +98,8 @@ namespace BetterMods.Gui
             // A modal question; see GuiScreenProfileMismatch for why the sidebar is hidden.
             ShowMainMenu = false;
 
-            int windowWidth = screenManager.GamePlatform.FramebufferSize.Width;
-            int windowHeight = screenManager.GamePlatform.FramebufferSize.Height;
+            int windowWidth = screenManager.GamePlatform.WindowSize.Width;
+            int windowHeight = screenManager.GamePlatform.WindowSize.Height;
 
             double guiScale = RuntimeEnv.GUIScale;
             if (!(guiScale > 0.01)) guiScale = 1.0;

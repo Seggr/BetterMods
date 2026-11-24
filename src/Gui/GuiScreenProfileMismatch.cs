@@ -155,11 +155,10 @@ namespace BetterMods.Gui
 
             string text = BuildText(prompt, active, suggested, canSwitch);
 
-            // Exactly the inputs dialogBase reads on 1.23: the FRAMEBUFFER size and
-            // RuntimeEnv.GUIScale, which since 1.23 is ClientSettings.GUIScale * DPIHScale. The
-            // setting alone undersizes the dialog on a HiDPI display.
-            int windowWidth = screenManager.GamePlatform.FramebufferSize.Width;
-            int windowHeight = screenManager.GamePlatform.FramebufferSize.Height;
+            // Exactly the inputs dialogBase reads on 1.22: the WINDOW size and the GUI scale
+            // (RuntimeEnv.GUIScale, which 1.22 keeps equal to ClientSettings.GUIScale).
+            int windowWidth = screenManager.GamePlatform.WindowSize.Width;
+            int windowHeight = screenManager.GamePlatform.WindowSize.Height;
 
             double guiScale = RuntimeEnv.GUIScale;
             if (!(guiScale > 0.01)) guiScale = 1.0;

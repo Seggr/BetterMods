@@ -108,7 +108,7 @@ namespace BetterMods.Gui
                 ElementBounds root = composer?.Bounds;
                 if (screen?.ScreenManager == null || root == null) return;
 
-                double windowWidth = screen.ScreenManager.GamePlatform.FramebufferSize.Width;
+                double windowWidth = screen.ScreenManager.GamePlatform.WindowSize.Width;
                 root.absOffsetX = CentredLeftPx(screen, windowWidth, root.OuterWidth);
             }
             catch (Exception e)

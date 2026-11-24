@@ -401,10 +401,9 @@ namespace BetterMods.Gui
 
             args.SetHandled();
 
-            // DeltaY is the continuous wheel delta - on 1.23 the obsolete deltaPrecise is assigned
-            // the very same value (ClientPlatformWindows.Mouse_WheelChanged) - and is what vanilla's
-            // own continuous scrollers (GuiElementScrollbar, GuiElementHorizontalTabs) read.
-            SetScrollOffset(scrollOffset - (double)args.DeltaY * scaled(20.0));
+            // deltaPrecise is the wheel delta vanilla's own continuous scrollers read on 1.22
+            // (GuiElementScrollbar.OnMouseWheel). 1.22 has no DeltaY.
+            SetScrollOffset(scrollOffset - (double)args.deltaPrecise * scaled(20.0));
         }
 
         public override void Dispose()

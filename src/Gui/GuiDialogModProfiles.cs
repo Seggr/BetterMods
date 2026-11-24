@@ -255,8 +255,8 @@ namespace BetterMods.Gui
                 }
                 names[profiles.Count] = "+";
 
-                // RuntimeEnv.GUIScale, not the setting: since 1.23 it folds in the display's DPI
-                // scale, and it is what GuiElement.scaled multiplies by.
+                // RuntimeEnv.GUIScale is what GuiElement.scaled multiplies by (on 1.22 it equals
+                // ClientSettings.GUIScale; 1.23 folds the display's DPI scale into it).
                 double guiScale = RuntimeEnv.GUIScale;
                 if (!(guiScale > 0.01)) guiScale = 1.0;
 
@@ -576,7 +576,7 @@ namespace BetterMods.Gui
                 element.OnMouseDownOnCellRight = OnToggleCell;
             }
 
-            // The left half is inert in vanilla (1.23's GuiScreenMods does not wire it at all), so it is
+            // The left half is inert in vanilla (an empty stub on 1.22, not wired at all on 1.23), so it is
             // free real estate - toggling from anywhere on the row is friendlier with a mouse-look
             // cursor. It is also where the version area lives, which a blocked mod still needs, so
             // this half is wired up unconditionally and the handler re-checks the block.

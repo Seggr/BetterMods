@@ -187,11 +187,11 @@ namespace BetterMods.Gui
         /// <summary>
         /// Draws <paramref name="bmp"/> centred inside the box, scaled to fit with the aspect ratio
         /// preserved - a wide banner letterboxes and a tall icon pillarboxes instead of being
-        /// stretched. Signature matches the <c>BitmapExternal</c> overload of
+        /// stretched. Signature matches 1.22's (only) <c>BitmapRef</c> overload of
         /// <c>SurfaceDrawImage.Image</c> exactly, and so does <c>ModIconGate.DrawIcon</c>, the operand
         /// the transpiler actually writes.
         /// </summary>
-        public static void DrawIconFitted(ImageSurface surface, BitmapExternal bmp, int xPos, int yPos, int width, int height)
+        public static void DrawIconFitted(ImageSurface surface, BitmapRef bmp, int xPos, int yPos, int width, int height)
         {
             try
             {

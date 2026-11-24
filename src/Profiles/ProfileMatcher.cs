@@ -59,11 +59,12 @@ namespace BetterMods.Profiles
         /// A world's recorded list with every mod id the client cannot load removed - see
         /// <see cref="InstalledModScanner.LoadsClientSide"/>. Null in, null out.
         /// <para>
-        /// A capture taken on 1.23 never contains a server-only mod, but one recorded on 1.22 does
-        /// (the client's loader still listed them then), and <see cref="EnabledKeys"/> no longer
-        /// predicts them - so without this, the first 1.23 start of such a world reports each one as
-        /// Missing, which is the warning case. Only ids that ARE installed and are server-only in
-        /// every copy are dropped; an id that is not installed at all is genuinely missing and stays.
+        /// On 1.23 a capture never contains a server-only mod, but one recorded on 1.22 does (the
+        /// client's loader still lists them there). On 1.22 itself nothing is filtered:
+        /// <see cref="InstalledModScanner.LoadsClientSide"/> is true for every mod, so the server-only
+        /// set is empty and the list comes back unchanged. Only ids that ARE installed and are
+        /// server-only in every copy are ever dropped; an id that is not installed at all is
+        /// genuinely missing and stays.
         /// </para>
         /// </summary>
         public static List<string> ClientLoadable(List<string> worldList, IEnumerable<ModContainer> installed)
@@ -157,8 +158,8 @@ namespace BetterMods.Profiles
                     // screen while this counts it as part of what the profile would load.
                     if (mod.Error == ModError.Blocked) continue;
 
-                    // 1.23's client loader switches off a mod whose Side excludes the client, so it
-                    // can never be part of what this profile loads client-side, nor of a capture.
+                    // A mod the client loader never loads is not part of a capture. On 1.22 that
+                    // is none (no side filter at load); see LoadsClientSide.
                     if (!InstalledModScanner.LoadsClientSide(info)) continue;
 
                     string key = InstalledModScanner.EntryKey(info);

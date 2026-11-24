@@ -178,13 +178,12 @@ namespace BetterMods.Patches
     /// splits a row, so this can never shadow the on/off switch.
     /// </para>
     /// <para>
-    /// On 1.22 this was a prefix on <c>GuiScreenMods.OnClickCellLeft</c>, an empty stub vanilla
-    /// wired to every row's <c>OnMouseDownOnCellLeft</c>. 1.23 deleted both the method and the
-    /// wiring - <c>createCellElem</c> now only assigns <c>OnMouseDownOnCellRight</c>, and only for a
-    /// row that is not blocked - so a left-half click reaches nobody. The row's left-click delegate
-    /// is therefore BetterMods' own now, installed on every cell as it is created. Whatever was in it
-    /// already (nothing on 1.23, but another mod could have put something there) still runs for
-    /// every click that was not aimed at the trigger box BetterMods drew.
+    /// On 1.22 <c>createCellElem</c> wires every row's <c>OnMouseDownOnCellLeft</c> to
+    /// <c>GuiScreenMods.OnClickCellLeft</c>, an empty stub (verified on the 1.22.7 dll); 1.23 deleted
+    /// both the method and the wiring. A postfix on <c>createCellElem</c> covers both: it wraps
+    /// whatever delegate the row already has (vanilla's stub on 1.22, nothing on 1.23, or another
+    /// mod's handler) and still runs it for every click that was not aimed at the trigger box
+    /// BetterMods drew.
     /// </para>
     /// </summary>
     [HarmonyPatch(typeof(GuiScreenMods), "createCellElem")]
