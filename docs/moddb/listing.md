@@ -73,7 +73,7 @@ so pick the two that matter most):
 
 | Shot | What to capture | Section in `description.html` |
 |---|---|---|
-| In-game dialog | **In game**, the Mod Profiles dialog over a world (bind its key under Settings > Controls first - it has none by default): tabs, cards with switches, the notice line, Apply Profile / Close. | "The in-game dialog" |
+| In-game dialog | **In game**, the Mod Profiles dialog over a world (bind its key under Settings > Controls first - it has none by default): tabs, cards with switches, the notice line, Apply Profile / Close. | "The in-game Mod Profiles dialog" |
 | Fix dependencies | A card with the yellow **Fix dependencies** button, hovered so the tooltip lists the dependency problems. | "Fix dependencies" |
 | World-start prompt | Starting a singleplayer world with the wrong profile: headline, list of missing mods, and **Cancel / Play with ... / Switch to ...**. | "Worlds remember their profile and mods" |
 | Open mod page question | The first-click question: **Cancel / Always trust mods.vintagestory.at / Open**. | "Open mod page and trusted links" |
@@ -103,7 +103,7 @@ Notes for later edits:
 - The editor strips `<script>`, `<style>` blocks, `<link>`, forms, `on*` attributes and most embeds.
   Keep styling inline, as the file does.
 - **Do not add HTML comments** - the site turns them into visible text.
-- The file is about 48 KB (most of it inline styling); the hard limit is 65,535 bytes. Keep
+- The file is about 46 KB (most of it inline styling); the hard limit is 65,535 bytes. Keep
   additions modest.
 - If the editor rewrites something on save, edit `description.html` here to match so the next paste
   does not undo it.

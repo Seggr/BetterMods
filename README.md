@@ -1,8 +1,21 @@
 # BetterMods
 
-Mod **profiles** for Vintage Story's mod manager. Keep named sets of enabled and disabled mods,
+Mod **profiles** for Vintage Story's mod manager + custom "Playstyles". Keep named sets of enabled and disabled mods,
 switch between them with one click, pick which installed version of a mod each profile uses, and
 update your mods from the mod DB - all inside the game's own Mods screen.
+
+## Lets be clear this is a filthy Hack of a mod
+This mod introduces features I believe should be stock in the game and I hope the developers look at this and say "oh yes he is correct this is how it should be" and then impliment everything it does, they don't even need to say thank you, I'll know ;3
+
+### Why is this a hack? becauase it requires abusing .net to do what I want
+
+Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on
+a normal launch the Mods screen stays vanilla until you have loaded a world once that session.
+
+The fix is a small **.NET startup hook**, `BetterModsHook.dll`, which the .NET runtime itself runs
+before the game starts. It waits for the game to finish starting, then loads BetterMods' patches,
+so the profile tabs are there from the very first screen. It does nothing else, and it changes
+nothing once a world is loaded.
 
 ![Main-menu Mods screen: profile tabs above the mod list, mod cards with update buttons, the update status with Update all, and Apply Profile](docs/moddb/screenshots/01-mods-screen.png)
 
@@ -15,32 +28,35 @@ update your mods from the mod DB - all inside the game's own Mods screen.
 
 ## Contents
 
-- [Profiles](#profiles)
-- [The in-game Mod Profiles dialog](#the-in-game-mod-profiles-dialog)
-- [Loading at startup (the startup hook)](#loading-at-startup-the-startup-hook)
-  - [Why it is needed](#why-it-is-needed)
-  - [The easy way: Add Shortcut (Windows)](#the-easy-way-add-shortcut-windows)
-  - [What the shortcut does](#what-the-shortcut-does)
-  - [BetterMods installs and updates the hook itself](#bettermods-installs-and-updates-the-hook-itself)
-  - [Making the shortcut by hand (Windows)](#making-the-shortcut-by-hand-windows)
-  - [Linux and macOS](#linux-and-macos)
-- [Mod cards](#mod-cards)
-- [Several versions of one mod](#several-versions-of-one-mod)
-- [Update checking](#update-checking)
-- [Open mod page and trusted links](#open-mod-page-and-trusted-links)
-- [Fix dependencies](#fix-dependencies)
-- [Core-mod protection](#core-mod-protection)
-- [Worlds remember their profile and mods](#worlds-remember-their-profile-and-mods)
-- [Saved playstyles (Accepted feature creep)](#saved-playstyles-accepted-feature-creep)
-  - [For mod authors: the `.vsplaystyle` format](#for-mod-authors-the-vsplaystyle-format)
-- [Multiplayer](#multiplayer)
-- [Network use](#network-use)
-- [Safety and fallbacks](#safety-and-fallbacks)
-- [Where BetterMods keeps its data](#where-bettermods-keeps-its-data)
-- [Uninstalling](#uninstalling)
-- [Known limitations](#known-limitations)
-- [Troubleshooting and bug reports](#troubleshooting-and-bug-reports)
-- [License](#license)
+- [BetterMods](#bettermods)
+  - [Lets be clear this is a filthy Hack of a mod](#lets-be-clear-this-is-a-filthy-hack-of-a-mod)
+    - [Why is this a hack? becauase it requires abusing .net to do what I want](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want)
+  - [Contents](#contents)
+  - [Profiles](#profiles)
+  - [The in-game Mod Profiles dialog](#the-in-game-mod-profiles-dialog)
+  - [Loading at startup (the startup hook)](#loading-at-startup-the-startup-hook)
+    - [The easy way: Add Shortcut (Windows)](#the-easy-way-add-shortcut-windows)
+    - [What the shortcut does](#what-the-shortcut-does)
+    - [BetterMods installs and updates the hook itself](#bettermods-installs-and-updates-the-hook-itself)
+    - [Making the shortcut by hand (Windows)](#making-the-shortcut-by-hand-windows)
+    - [Linux and macOS](#linux-and-macos)
+  - [Mod cards](#mod-cards)
+  - [Several versions of one mod](#several-versions-of-one-mod)
+  - [Update checking](#update-checking)
+  - [Open mod page and trusted links](#open-mod-page-and-trusted-links)
+  - [Fix dependencies](#fix-dependencies)
+  - [Core-mod protection](#core-mod-protection)
+  - [Worlds remember their profile and mods](#worlds-remember-their-profile-and-mods)
+  - [Saved playstyles (Accepted feature creep)](#saved-playstyles-accepted-feature-creep)
+    - [For mod authors: the `.vsplaystyle` format](#for-mod-authors-the-vsplaystyle-format)
+  - [Multiplayer](#multiplayer)
+  - [Network use](#network-use)
+  - [Safety and fallbacks](#safety-and-fallbacks)
+  - [Where BetterMods keeps its data](#where-bettermods-keeps-its-data)
+  - [Uninstalling](#uninstalling)
+  - [Known limitations](#known-limitations)
+  - [Troubleshooting and bug reports](#troubleshooting-and-bug-reports)
+  - [License](#license)
 
 ## Profiles
 
@@ -101,15 +117,7 @@ game restart is needed, except in the version case under
 
 ## Loading at startup (the startup hook)
 
-### Why it is needed
-
-Vintage Story runs no mod code before a world loads - the main menu only reads mod metadata. So on
-a normal launch the Mods screen stays vanilla until you have loaded a world once that session.
-
-The fix is a small **.NET startup hook**, `BetterModsHook.dll`, which the .NET runtime itself runs
-before the game starts. It waits for the game to finish starting, then loads BetterMods' patches,
-so the profile tabs are there from the very first screen. It does nothing else, and it changes
-nothing once a world is loaded.
+Why this is needed: see [Why is this a hack?](#why-is-this-a-hack-becauase-it-requires-abusing-net-to-do-what-i-want).
 
 ### The easy way: Add Shortcut (Windows)
 
