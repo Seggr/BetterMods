@@ -11,7 +11,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!-- Deliberately NOT under bin\$(Configuration)\Mods: a loose .dll inside a mod search path is
          collected as EnumModSourceType.DLL and errors out as a code mod with no ModSystem. -->
-    <OutputPath>..\bin\$(Configuration)\Hook</OutputPath>
+    <OutputPath>../bin/$(Configuration)/Hook</OutputPath>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <!-- This assembly is loaded before the game's AssemblyResolver exists, so it must be loadable

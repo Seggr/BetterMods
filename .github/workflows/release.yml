@@ -1,0 +1,121 @@
+name: Release
+
+# Pushing a tag vX.Y.Z builds the mod and publishes bettermods_X.Y.Z.zip as a GitHub Release.
+# The tag must match modinfo.json's version and point at a commit on main.
+# Uploading to the Vintage Story mod DB stays manual (it has no upload API); the release notes
+# carry the steps.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      game-version: ${{ steps.check.outputs.game-version }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag against modinfo.json and main
+        id: check
+        run: |
+          set -euo pipefail
+          version="$(jq -er '.version' modinfo.json)"
+          game="$(jq -er '.dependencies.game' modinfo.json)"
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error file=modinfo.json::Tag $GITHUB_REF_NAME does not match modinfo.json version $version (expected tag v$version)"
+            exit 1
+          fi
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag $GITHUB_REF_NAME points at $GITHUB_SHA, which is not on main"
+            exit 1
+          fi
+          echo "Tag $GITHUB_REF_NAME = modinfo.json $version, on main; game dependency $game"
+          {
+            echo "version=$version"
+            echo "game-version=$game"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build
+    needs: verify
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    name: GitHub Release
+    needs: [verify, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the mod zip
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact-name }}
+          path: dist
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.verify.outputs.version }}
+          BUILT_VERSION: ${{ needs.build.outputs.version }}
+          GAME_VERSION: ${{ needs.verify.outputs.game-version }}
+          ZIP_NAME: ${{ needs.build.outputs.zip-name }}
+        run: |
+          set -euo pipefail
+          if [ "$BUILT_VERSION" != "$VERSION" ]; then
+            echo "::error::Built version $BUILT_VERSION does not match the tag's version $VERSION"
+            exit 1
+          fi
+          zip="dist/$ZIP_NAME"
+          test -f "$zip"
+
+          # GitHub's generated notes first, then the mod DB block. (gh release create
+          # --generate-notes would put a --notes-file in front of the generated notes instead.)
+          notes="$RUNNER_TEMP/release-notes.md"
+          gh api --method POST "repos/$GH_REPO/releases/generate-notes" \
+            -f tag_name="$GITHUB_REF_NAME" --jq .body > "$notes"
+          cat >> "$notes" <<EOF
+
+          ---
+
+          ## Mod DB upload
+
+          The mod DB has no upload API, so this release goes onto https://mods.vintagestory.at/bettermods by hand:
+
+          1. Download \`$ZIP_NAME\` from this release's assets.
+          2. On the mod page, open the form for adding a new release and upload \`$ZIP_NAME\`. The mod DB reads the version (\`$VERSION\`) from the zip's \`modinfo.json\` and rejects a version it already has.
+          3. Tick the game version **$GAME_VERSION**.
+          4. Paste the changelog (these notes, without this block) and save.
+
+          One-click install, which works once the mod DB has this release: \`vintagestorymodinstall://bettermods@$VERSION\`
+          EOF
+
+          flags=()
+          # A release built for a pre-release or release-candidate game version is a pre-release.
+          if [[ "$GAME_VERSION" == *-* ]]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" "$zip" \
+            --verify-tag \
+            --title "BetterMods $VERSION" \
+            --notes-file "$notes" \
+            "${flags[@]}"

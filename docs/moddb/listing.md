@@ -111,3 +111,22 @@ Notes for later edits:
 - If the editor rewrites something on save, edit `description.html` here to match so the next paste
   does not undo it.
 - Images are loaded from `raw.githubusercontent.com` on `main`; keep the files there.
+
+## Publishing a release
+
+The GitHub Release is built by `.github/workflows/release.yml`; the mod DB upload is manual (the DB
+has no upload API).
+
+1. Bump `"version"` in `modinfo.json` (and `dependencies.game` if the target game version changed).
+2. Commit it on `main`.
+3. Tag that commit `vX.Y.Z`, matching the new version exactly: `git tag vX.Y.Z`.
+4. Push `main`, then the tag: `git push origin main`, `git push origin vX.Y.Z`.
+5. Wait for the **Release** workflow to finish. It refuses a tag that does not match `modinfo.json`
+   or is not on `main`, and it marks the release as a pre-release when the game version has a
+   suffix such as `-pre.1`.
+6. Download `bettermods_X.Y.Z.zip` from the new GitHub Release.
+7. On the mod page's add-release form, upload the zip, tick the game version from `modinfo.json`'s
+   `dependencies.game`, paste the changelog (the release notes, without their Mod DB upload
+   block), and save. The DB reads the version
+   from the zip and refuses one it already has. The release notes' **Mod DB upload** block repeats
+   these steps with the exact names filled in.

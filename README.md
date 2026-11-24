@@ -67,6 +67,7 @@ update your mods from the mod DB - all inside the game's own Mods screen.
   - [Uninstalling](#uninstalling)
   - [Known limitations](#known-limitations)
   - [Troubleshooting and bug reports](#troubleshooting-and-bug-reports)
+  - [Releases](#releases)
   - [License](#license)
 
 ## Installing
@@ -594,6 +595,12 @@ Common questions:
   with this session. Restart the game, or pick the version you were using.
 - *"No newer releases for 1.23.0-pre.1"?* That is not "up to date": no release on the mod DB is
   tagged for your exact game version.
+
+## Releases
+
+GitHub Releases are built automatically: pushing a version tag (`vX.Y.Z`, matching `modinfo.json`)
+builds the mod zip and attaches it to a new release. Uploading that zip to the mod DB is done by
+hand.
 
 ## License
 

@@ -10,7 +10,9 @@
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>bin\$(Configuration)\Mods\bettermods</OutputPath>
+    <!-- Paths below use forward slashes so the same project builds on Windows and on the Linux CI
+         runner (.github/workflows/ci.yml). -->
+    <OutputPath>bin/$(Configuration)/Mods/bettermods</OutputPath>
     <!-- VINTAGE_STORY is normally an environment variable pointing at the game install.
          When it is not set, fall back to this install path. -->
     <VINTAGE_STORY Condition="'$(VINTAGE_STORY)' == ''">A:\Vintagestory</VINTAGE_STORY>
@@ -28,23 +30,23 @@
 
   <ItemGroup>
     <Reference Include="VintagestoryAPI">
-      <HintPath>$(VINTAGE_STORY)\VintagestoryAPI.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="VintagestoryLib">
-      <HintPath>$(VINTAGE_STORY)\VintagestoryLib.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY)/VintagestoryLib.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="0Harmony">
-      <HintPath>$(VINTAGE_STORY)\Lib\0Harmony.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>$(VINTAGE_STORY)\Lib\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY)/Lib/Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="cairo-sharp">
-      <HintPath>$(VINTAGE_STORY)\Lib\cairo-sharp.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY)/Lib/cairo-sharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

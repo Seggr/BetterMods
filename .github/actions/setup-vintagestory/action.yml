@@ -1,0 +1,89 @@
+name: Set up Vintage Story assemblies
+description: >-
+  Fetches the Vintage Story assemblies BetterMods compiles against (VintagestoryAPI.dll,
+  VintagestoryLib.dll and Lib/*.dll) from the official CDN for the game version in modinfo.json,
+  caches them, and exports VINTAGE_STORY for the build. Game files are never uploaded anywhere
+  else.
+
+inputs:
+  game-version:
+    description: Game version to build against. Defaults to modinfo.json's dependencies.game.
+    required: false
+    default: ''
+
+outputs:
+  game-version:
+    description: The game version the assemblies belong to.
+    value: ${{ steps.resolve.outputs.version }}
+  path:
+    description: Folder holding the assemblies (also exported as VINTAGE_STORY).
+    value: ${{ steps.resolve.outputs.dir }}
+  archive:
+    description: Where the assemblies came from - server, client or cached.
+    value: ${{ steps.fetch.outputs.archive }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve the game version
+      id: resolve
+      shell: bash
+      env:
+        INPUT_GAME_VERSION: ${{ inputs.game-version }}
+      run: |
+        set -euo pipefail
+        version="$INPUT_GAME_VERSION"
+        if [ -z "$version" ]; then
+          version="$(jq -er '.dependencies.game' modinfo.json)"
+        fi
+        if ! [[ "$version" =~ ^[0-9]+(\.[0-9]+)+(-[0-9A-Za-z.]+)?$ ]]; then
+          echo "::error file=modinfo.json::Unexpected game version '$version'"
+          exit 1
+        fi
+        # The CDN folder follows the release kind: x.y.z-pre.N -> pre, x.y.z-rc.N -> unstable,
+        # plain x.y.z -> stable.
+        case "$version" in
+          *-pre.*) channel=pre ;;
+          *-rc.*) channel=unstable ;;
+          *) channel=stable ;;
+        esac
+        dir="$RUNNER_TEMP/vintagestory/$version"
+        echo "Game version $version, CDN channel $channel"
+        {
+          echo "version=$version"
+          echo "channel=$channel"
+          echo "dir=$dir"
+        } >> "$GITHUB_OUTPUT"
+
+    # The primary key names the server archive (the usual source); the restore key also accepts
+    # an entry saved from the client archive fallback.
+    - name: Restore cached assemblies
+      id: cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ steps.resolve.outputs.dir }}
+        key: vintagestory-refs-${{ runner.os }}-${{ steps.resolve.outputs.version }}-server
+        restore-keys: |
+          vintagestory-refs-${{ runner.os }}-${{ steps.resolve.outputs.version }}-
+
+    - name: Fetch assemblies
+      id: fetch
+      shell: bash
+      env:
+        VS_VERSION: ${{ steps.resolve.outputs.version }}
+        VS_CHANNEL: ${{ steps.resolve.outputs.channel }}
+        VS_DIR: ${{ steps.resolve.outputs.dir }}
+      run: bash "$GITHUB_ACTION_PATH/fetch.sh"
+
+    - name: Save assemblies to the cache
+      if: steps.fetch.outputs.downloaded == 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ steps.resolve.outputs.dir }}
+        key: vintagestory-refs-${{ runner.os }}-${{ steps.resolve.outputs.version }}-${{ steps.fetch.outputs.archive }}
+
+    - name: Export VINTAGE_STORY
+      shell: bash
+      env:
+        VS_DIR: ${{ steps.resolve.outputs.dir }}
+      run: echo "VINTAGE_STORY=$VS_DIR" >> "$GITHUB_ENV"
