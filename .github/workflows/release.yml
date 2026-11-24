@@ -1,7 +1,9 @@
 name: Release
 
 # Pushing a tag vX.Y.Z builds the mod and publishes bettermods_X.Y.Z.zip as a GitHub Release.
-# The tag must match modinfo.json's version and point at a commit on main.
+# The tag must match modinfo.json's version and point at a commit on main (the Vintage Story 1.23
+# build) or on 1.22.x (the Vintage Story 1.22 build). The game version the release is for comes from
+# that commit's modinfo.json.
 # Uploading to the Vintage Story mod DB stays manual (it has no upload API); the release notes
 # carry the steps.
 
@@ -30,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check the tag against modinfo.json and main
+      - name: Check the tag against modinfo.json and the release branches
         id: check
         run: |
           set -euo pipefail
@@ -40,12 +42,20 @@ jobs:
             echo "::error file=modinfo.json::Tag $GITHUB_REF_NAME does not match modinfo.json version $version (expected tag v$version)"
             exit 1
           fi
-          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
-          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
-            echo "::error::Tag $GITHUB_REF_NAME points at $GITHUB_SHA, which is not on main"
+          # A release branch that does not exist on the remote is skipped, not an error.
+          on_branch=""
+          for branch in main 1.22.x; do
+            if git fetch --no-tags origin "+refs/heads/$branch:refs/remotes/origin/$branch" 2>/dev/null \
+              && git merge-base --is-ancestor "$GITHUB_SHA" "origin/$branch"; then
+              on_branch="$branch"
+              break
+            fi
+          done
+          if [ -z "$on_branch" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME points at $GITHUB_SHA, which is not on main or 1.22.x"
             exit 1
           fi
-          echo "Tag $GITHUB_REF_NAME = modinfo.json $version, on main; game dependency $game"
+          echo "Tag $GITHUB_REF_NAME = modinfo.json $version, on $on_branch; game dependency $game"
           {
             echo "version=$version"
             echo "game-version=$game"
