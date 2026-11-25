@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -11,9 +12,9 @@ namespace BetterMods.Startup
     /// The "launch with the startup hook" command, and - on Windows - the desktop shortcut that runs it.
     /// <para>
     /// The shortcut is <c>cmd.exe</c> with
-    /// <c>/c if exist "&lt;hook&gt;" (set "DOTNET_STARTUP_HOOKS=&lt;hook&gt;") &amp; start "" "&lt;game exe&gt;"</c>,
-    /// minimised, in the game folder, with the game's icon. The <c>if exist</c> guard is deliberate and
-    /// load-bearing: a <c>DOTNET_STARTUP_HOOKS</c> entry naming a missing file stops the game launching
+    /// <c>/d /v:on /c set "H=&lt;hook&gt;" &amp; (if exist "!H!" set "DOTNET_STARTUP_HOOKS=!H!") &amp; start "" "&lt;game exe&gt;"</c>
+    /// (see <see cref="CmdArguments"/>), minimised, in the game folder, with the game's icon. The
+    /// <c>if exist</c> guard is deliberate and load-bearing: a <c>DOTNET_STARTUP_HOOKS</c> entry naming a missing file stops the game launching
     /// at all, so the variable is only set when the file is really there - delete
     /// <c>ModConfig\BetterMods\</c> and the shortcut still starts a plain game. The variable is set in
     /// that one cmd process and inherited by the game only; nothing machine-wide is touched.
@@ -50,8 +51,9 @@ namespace BetterMods.Startup
 
         /// <summary>
         /// The desktop already has our shortcut: a file named <see cref="ShortcutName"/>.lnk, or any
-        /// .lnk that runs <c>cmd.exe</c> and names <paramref name="hookPath"/> (one the player renamed
-        /// or made by hand). Returns the one found in <paramref name="found"/>.
+        /// .lnk that runs <c>cmd.exe</c> and names <paramref name="hookPath"/> in any of the forms of
+        /// <see cref="HookSignatures"/> (one the player renamed or made by hand). Returns the one found
+        /// in <paramref name="found"/>.
         /// <para>
         /// Reads the .lnk files' bytes rather than resolving each one through the shell: the target
         /// path is stored as text (ANSI in the link info, UTF-16 in the string data and the ID list)
@@ -77,9 +79,11 @@ namespace BetterMods.Startup
 
                 if (string.IsNullOrEmpty(hookPath)) return false;
 
+                string[][] signatures = HookSignatures(hookPath, DataPathArgument());
+
                 foreach (string file in Directory.EnumerateFiles(desktop, "*.lnk"))
                 {
-                    if (!LooksLikeOurs(file, hookPath)) continue;
+                    if (!LooksLikeOurs(file, signatures)) continue;
 
                     found = file;
                     return true;
@@ -93,7 +97,26 @@ namespace BetterMods.Startup
             return false;
         }
 
-        private static bool LooksLikeOurs(string file, string hookPath)
+        /// <summary>
+        /// The ways a shortcut can name <paramref name="hookPath"/>; a .lnk naming it holds every string
+        /// of one of these sets. The literal path (shortcuts from before the variables, and hand-made
+        /// ones), the path with <c>%APPDATA%</c> for its AppData folder, and - with a data path - the
+        /// <c>D</c> value plus the hook written relative to it, exactly as <see cref="CmdArguments"/>
+        /// writes them.
+        /// </summary>
+        private static string[][] HookSignatures(string hookPath, string dataPath)
+        {
+            CmdValues(hookPath, dataPath, out string data, out string hook);
+            string appData = WithAppDataVariable(hookPath);
+
+            List<string[]> signatures = new List<string[]> { new[] { hookPath } };
+            if (!string.Equals(appData, hookPath, StringComparison.OrdinalIgnoreCase)) signatures.Add(new[] { appData });
+            if (data != null && hook.StartsWith("!D!", StringComparison.Ordinal)) signatures.Add(new[] { "\"D=" + data + "\"", hook });
+
+            return signatures.ToArray();
+        }
+
+        private static bool LooksLikeOurs(string file, string[][] signatures)
         {
             try
             {
@@ -108,8 +131,24 @@ namespace BetterMods.Startup
                 string odd = bytes.Length > 1 ? Encoding.Unicode.GetString(bytes, 1, bytes.Length - 1) : "";
                 string ansi = Encoding.Latin1.GetString(bytes);
 
-                bool namesHook = even.Contains(hookPath, StringComparison.OrdinalIgnoreCase) ||
-                                 odd.Contains(hookPath, StringComparison.OrdinalIgnoreCase);
+                bool namesHook = false;
+                foreach (string[] signature in signatures)
+                {
+                    bool all = true;
+                    foreach (string part in signature)
+                    {
+                        if (even.Contains(part, StringComparison.OrdinalIgnoreCase) || odd.Contains(part, StringComparison.OrdinalIgnoreCase)) continue;
+
+                        all = false;
+                        break;
+                    }
+
+                    if (!all) continue;
+
+                    namesHook = true;
+                    break;
+                }
+
                 if (!namesHook) return false;
 
                 return even.Contains("cmd.exe", StringComparison.OrdinalIgnoreCase) ||
@@ -236,28 +275,129 @@ namespace BetterMods.Startup
         }
 
         /// <summary>
-        /// The cmd.exe arguments the shortcut runs. Null (with a reason) when a path holds a character
-        /// cmd.exe would reinterpret even inside quotes: <c>%</c> (variable expansion on a
-        /// <c>/c</c> line) or <c>"</c>.
+        /// The most characters of a .lnk's arguments Windows passes on when the shortcut is started.
+        /// Longer ones are cut there (the shell reads back 259 too), so the command would break.
+        /// </summary>
+        public const int MaxShortcutArguments = 259;
+
+        /// <summary>
+        /// The cmd.exe arguments the shortcut runs:
+        /// <c>/d /v:on /c [set "D=&lt;data&gt;" &amp; ]set "H=&lt;hook&gt;" &amp; (if exist "!H!" set "DOTNET_STARTUP_HOOKS=!H!") &amp; start "" "&lt;exe&gt;"[ --dataPath "!D!"]</c>.
+        /// <para>
+        /// The parentheses are load-bearing: without them cmd makes everything after the <c>if</c>
+        /// part of it, and a missing hook file would start nothing. The paths sit in variables
+        /// (read with delayed expansion, <c>!H!</c>) so each long path is written once, the hook is
+        /// written relative to <c>D</c> when it lives there, and a leading AppData folder is written
+        /// as <c>%APPDATA%</c> - all to stay within <see cref="MaxShortcutArguments"/>. If the line is
+        /// still too long, the game is named <c>.\Vintagestory.exe</c>, relative to the shortcut's
+        /// working directory (the game folder).
+        /// </para>
+        /// Null (with a reason) when a path holds a character cmd.exe would reinterpret even inside
+        /// quotes - <c>%</c>, <c>!</c> and <c>^</c> (variable expansion) or <c>"</c> - or when the line
+        /// would still be too long.
         /// </summary>
         public static string CmdArguments(string hookPath, string gameExe, string dataPath, out string error)
         {
             error = null;
 
+            if (string.IsNullOrEmpty(hookPath) || string.IsNullOrEmpty(gameExe))
+            {
+                error = "the startup hook or game path is unknown";
+                return null;
+            }
+
             foreach (string path in new[] { hookPath, gameExe, dataPath })
             {
                 if (path == null) continue;
-                if (path.IndexOf('%') >= 0 || path.IndexOf('"') >= 0)
+                if (path.IndexOfAny(CmdUnsafe) >= 0)
                 {
-                    error = "the path '" + path + "' contains a character a shortcut cannot pass through cmd.exe (% or \")";
+                    error = "the path '" + path + "' contains a character a shortcut cannot pass through cmd.exe (% ! ^ or \")";
                     return null;
                 }
             }
 
-            string arguments = "/c if exist \"" + hookPath + "\" (set \"DOTNET_STARTUP_HOOKS=" + hookPath + "\") & start \"\" \"" + gameExe + "\"";
-            if (dataPath != null) arguments += " --dataPath \"" + dataPath + "\"";
+            CmdValues(hookPath, dataPath, out string data, out string hook);
+
+            string arguments = CmdLine(data, hook, WithAppDataVariable(gameExe));
+
+            // Still too long: name the game relative to the shortcut's working directory, which
+            // TryCreate sets to the game folder (/d keeps an AutoRun script from changing it).
+            if (arguments.Length > MaxShortcutArguments) arguments = CmdLine(data, hook, ".\\" + Path.GetFileName(gameExe));
+
+            if (arguments.Length > MaxShortcutArguments)
+            {
+                error = "the shortcut command would be " + arguments.Length + " characters, more than the " + MaxShortcutArguments +
+                        " Windows passes on (the data folder path is too long)";
+                return null;
+            }
 
             return arguments;
+        }
+
+        private static string CmdLine(string data, string hook, string gameExe)
+        {
+            StringBuilder line = new StringBuilder("/d /v:on /c ");
+            if (data != null) line.Append("set \"D=").Append(data).Append("\" & ");
+            line.Append("set \"H=").Append(hook).Append("\" & (if exist \"!H!\" set \"DOTNET_STARTUP_HOOKS=!H!\") & start \"\" \"")
+                .Append(gameExe).Append('"');
+            if (data != null) line.Append(" --dataPath \"!D!\"");
+
+            return line.ToString();
+        }
+
+        private static readonly char[] CmdUnsafe = { '%', '"', '!', '^' };
+
+        /// <summary>
+        /// What <see cref="CmdArguments"/> writes for <c>D</c> (null without a data path) and
+        /// <c>H</c>: the hook as <c>!D!\...</c> when it lives under the data path, a leading AppData
+        /// folder as <c>%APPDATA%</c>.
+        /// </summary>
+        private static void CmdValues(string hookPath, string dataPath, out string data, out string hook)
+        {
+            data = dataPath == null ? null : WithAppDataVariable(dataPath);
+
+            if (dataPath != null && hookPath.Length > dataPath.Length &&
+                hookPath.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase) &&
+                hookPath[dataPath.Length] == Path.DirectorySeparatorChar)
+            {
+                hook = "!D!" + hookPath.Substring(dataPath.Length);
+            }
+            else
+            {
+                hook = WithAppDataVariable(hookPath);
+            }
+        }
+
+        /// <summary>
+        /// <paramref name="path"/> with a leading AppData folder written as <c>%APPDATA%</c>, which
+        /// cmd expands when the shortcut starts. Only when the <c>APPDATA</c> variable and the shell's
+        /// AppData folder agree; any other path is returned as it is.
+        /// </summary>
+        private static string WithAppDataVariable(string path)
+        {
+            try
+            {
+                string variable = Environment.GetEnvironmentVariable("APPDATA");
+                string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                if (string.IsNullOrEmpty(variable) || string.IsNullOrEmpty(folder)) return path;
+
+                variable = Path.TrimEndingDirectorySeparator(variable);
+                folder = Path.TrimEndingDirectorySeparator(folder);
+                if (!string.Equals(variable, folder, StringComparison.OrdinalIgnoreCase)) return path;
+
+                if (path.Length > folder.Length &&
+                    path.StartsWith(folder, StringComparison.OrdinalIgnoreCase) &&
+                    path[folder.Length] == Path.DirectorySeparatorChar)
+                {
+                    return "%APPDATA%" + path.Substring(folder.Length);
+                }
+            }
+            catch (Exception)
+            {
+                // The literal path always works.
+            }
+
+            return path;
         }
 
         // ---------------------------------------------------------------- the shortcut (Windows)
