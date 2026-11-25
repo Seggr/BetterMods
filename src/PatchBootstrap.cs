@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BetterMods.Profiles;
 using HarmonyLib;
 using Vintagestory.Client;
@@ -206,10 +207,12 @@ namespace BetterMods
         // ---------------------------------------------------------------- disabled check
 
         /// <summary>
-        /// True if the player has switched BetterMods off. <c>ClientSettings.DisabledMods</c> holds
-        /// <c>"modid@version"</c> entries (ClientSettings.cs:1396-1406), but <c>ModLoader.DisableMods</c>
-        /// also honours a bare <c>modid</c> (ModLoader.cs:325), so both forms count. Any version of
-        /// our id matches: whichever one the player switched off is the one that is installed.
+        /// True if the player has switched THIS copy of BetterMods off. <c>ClientSettings.DisabledMods</c>
+        /// holds <c>"modid@version"</c> entries (ClientSettings.cs:1396-1406), and
+        /// <c>ModLoader.DisableMods</c> also honours a bare <c>modid</c> (ModLoader.cs:325). Only the
+        /// bare id and the running copy's own <c>bettermods@&lt;version&gt;</c> count: with two
+        /// versions installed and the older one switched off, the entry for the older one must not
+        /// stop the newer one patching. <see cref="SelfDisableRule"/> holds the decision.
         /// <para>
         /// Fails open. A settings read that goes wrong must not silently turn the mod off - that is
         /// the failure mode this whole check exists to remove.
@@ -220,18 +223,9 @@ namespace BetterMods
             try
             {
                 List<string> disabled = ClientSettings.DisabledMods;
-                if (disabled == null) return false;
+                if (disabled == null || disabled.Count == 0) return false;
 
-                string prefix = BetterModsModSystem.ModId + "@";
-
-                foreach (string entry in disabled)
-                {
-                    if (string.IsNullOrWhiteSpace(entry)) continue;
-
-                    string trimmed = entry.Trim();
-                    if (trimmed.Equals(BetterModsModSystem.ModId, StringComparison.OrdinalIgnoreCase)) return true;
-                    if (trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return true;
-                }
+                return SelfDisableRule.IsSwitchedOff(disabled, BetterModsModSystem.ModId, RunningVersion());
             }
             catch (Exception e)
             {
@@ -240,6 +234,56 @@ namespace BetterMods
             }
 
             return false;
+        }
+
+        private static bool runningVersionResolved;
+        private static string runningVersion;
+
+        /// <summary>
+        /// The <c>version</c> of the running copy, from the <c>modinfo.json</c> beside this assembly,
+        /// or null if it cannot be read. Resolved once per process; never throws.
+        /// <para>
+        /// Both load paths put that file there: the game (<c>ModAssemblyLoader.LoadFrom</c>) and the
+        /// startup hook both <c>Assembly.UnsafeLoadFrom</c> the dll out of the mod's folder - the
+        /// mod folder itself, or for a zip the <c>Cache\unpack\...</c> folder the zip was extracted
+        /// to, which holds the archive's own <c>modinfo.json</c>. <c>Location</c> is empty only for
+        /// an assembly loaded from bytes, which neither path does (only compiled <c>.cs</c> mods
+        /// are); that case is handled anyway, as "unknown".
+        /// </para>
+        /// </summary>
+        private static string RunningVersion()
+        {
+            if (runningVersionResolved) return runningVersion;
+            runningVersionResolved = true;
+
+            try
+            {
+                string location = typeof(PatchBootstrap).Assembly.Location;
+                string directory = string.IsNullOrEmpty(location) ? null : Path.GetDirectoryName(location);
+                string modInfoPath = directory == null ? null : Path.Combine(directory, "modinfo.json");
+
+                if (modInfoPath != null && File.Exists(modInfoPath))
+                {
+                    runningVersion = SelfDisableRule.ReadVersion(File.ReadAllText(modInfoPath));
+                }
+
+                if (runningVersion == null)
+                {
+                    BetterModsModSystem.Logger?.Warning(
+                        "[BetterMods] Could not determine this copy's version (no readable modinfo.json beside '" +
+                        location + "'); only a bare '" + BetterModsModSystem.ModId +
+                        "' entry in the disabled mods will switch BetterMods off this session.");
+                }
+            }
+            catch (Exception e)
+            {
+                runningVersion = null;
+                BetterModsModSystem.Logger?.Warning(
+                    "[BetterMods] Could not determine this copy's version (" + e.Message + "); only a bare '" +
+                    BetterModsModSystem.ModId + "' entry in the disabled mods will switch BetterMods off this session.");
+            }
+
+            return runningVersion;
         }
 
         private static void EnsureProfileStore()
