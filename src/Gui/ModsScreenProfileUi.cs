@@ -238,9 +238,11 @@ namespace BetterMods.Gui
         }
 
         /// <summary>
-        /// Drops the version picker out of a row's version text. Picking an entry points the viewed
-        /// profile at that version and rebuilds the screen — the version is drawn into the cell
-        /// texture, so nothing short of a rebuild shows the change.
+        /// Drops the version picker out of a row's version text. Picking an installed entry points
+        /// the viewed profile at that version and rebuilds the screen — the version is drawn into the
+        /// cell texture, so nothing short of a rebuild shows the change. Picking a greyed-out mod DB
+        /// release installs it with the update installer and switches the viewed profile to it
+        /// (<see cref="InstallPickedVersion"/>).
         /// </summary>
         public static void OpenVersionMenu(GuiScreenMods screen, GuiElementModCell cell, ModVersionGroup group)
         {
@@ -249,13 +251,32 @@ namespace BetterMods.Gui
             if (menu == null || cell == null || group == null) return;
 
             string profileId = ViewedProfileId;
+            VersionMenuSession session = new VersionMenuSession(group, canInstall: true);
+            session.Begin();
 
-            bool opened = menu.OpenFor(cell, group.VersionNames(), group.SelectedIndex, index =>
+            bool opened = menu.OpenFor(cell, session.Build, index =>
             {
-                ModGrouping.SelectVersion(profileId, group, index);
-                MirrorToClientSettingsIfActive(group);
-                RebuildDeferred(screen);
-            });
+                VersionRow row = session.RowAt(index);
+                switch (row?.Kind)
+                {
+                    case VersionRowKind.Installed:
+                        ModGrouping.SelectVersion(profileId, group, row.InstalledIndex);
+                        MirrorToClientSettingsIfActive(group);
+                        RebuildDeferred(screen);
+                        return VersionMenuPick.Close;
+
+                    case VersionRowKind.ShowAll:
+                        session.ExpandAll();
+                        return VersionMenuPick.KeepOpen;
+
+                    case VersionRowKind.Available:
+                        InstallPickedVersion(screen, group, row, profileId);
+                        return VersionMenuPick.Close;
+
+                    default:
+                        return VersionMenuPick.KeepOpen;
+                }
+            }, VersionMenuSession.Stamp);
             if (!opened) return;
 
             // Focus is what makes the composer close the popup again when the next click lands
@@ -710,26 +731,77 @@ namespace BetterMods.Gui
 
             string modId = group.ModId;
             string profileId = ViewedProfileId;
-            string target = ModUpdateRules.AsciiLine(offer.TargetVersion, 40);
-            string older = ModUpdateRules.AsciiLine(offer.OlderGameVersion, 30);
-            string running = ModUpdateRules.AsciiLine(ModUpdateService.GameVersionChecked, 30);
-            string name = ModUpdateRules.AsciiLine(group.Selected?.Info?.Name ?? modId, 60);
 
-            string body =
-                "<strong>" + Vtml(name) + " " + Vtml(target) + "</strong> is tagged for game version <strong>" + Vtml(older) +
-                "</strong>, not for " + Vtml(running) + ". It has not been marked as tested on this version and may not work.\n\n" +
-                (offer.Retracted ? "The installed release was retracted on the mod DB" +
-                                   (string.IsNullOrEmpty(offer.RetractionReason) ? "." : ": " + Vtml(offer.RetractionReason)) + "\n\n" : "") +
-                "Only the profile you are viewing switches to it; every other profile keeps the version it has. " +
-                "The installed version stays on disk.\n\nInstall it anyway?";
+            string body = OtherGameVersionBody(group, offer.TargetVersion, offer.OlderGameVersion, offer, out string title);
 
-            ShowConfirm(screen, "Install a release made for " + older + "?", body, "Install", confirmed =>
+            ShowConfirm(screen, title, body, "Install", confirmed =>
             {
                 if (!confirmed) return;
 
                 // Re-read after the return trip: OnScreenLoaded republished the groups.
                 if (!GroupsByModId.TryGetValue(modId, out ModVersionGroup fresh)) fresh = group;
                 if (ModUpdateService.StartInstall(new List<ModVersionGroup> { fresh }, profileId, includeOlderGameVersion: true) > 0)
+                {
+                    screen?.ElementComposer?.Api?.Gui.PlaySound("menubutton");
+                }
+            });
+        }
+
+        /// <summary>
+        /// The question asked before installing a release that is not tagged for the running game
+        /// version - the card's tier-2 "Update to x (1.22)" and the version picker's warning-hinted
+        /// rows alike. <paramref name="taggedFor"/> null means the release carries no game-version tag.
+        /// <paramref name="offer"/> (may be null) adds the installed release's retraction, as before.
+        /// </summary>
+        private static string OtherGameVersionBody(ModVersionGroup group, string targetVersion, string taggedFor, UpdateOffer offer, out string title)
+        {
+            string target = ModUpdateRules.AsciiLine(targetVersion, 40);
+            string running = ModUpdateRules.AsciiLine(ModUpdateService.GameVersionChecked, 30);
+            string name = ModUpdateRules.AsciiLine(group.Selected?.Info?.Name ?? group.ModId, 60);
+            string tagged = string.IsNullOrWhiteSpace(taggedFor) ? null : ModUpdateRules.AsciiLine(taggedFor, 30);
+
+            title = tagged != null ? "Install a release made for " + tagged + "?" : "Install an untagged release?";
+
+            return
+                "<strong>" + Vtml(name) + " " + Vtml(target) + "</strong> " +
+                (tagged != null
+                    ? "is tagged for game version <strong>" + Vtml(tagged) + "</strong>, not for " + Vtml(running) + ". It has not been marked as tested on this version and may not work.\n\n"
+                    : "is not tagged for any game version, so it has not been marked as tested on " + Vtml(running) + " and may not work.\n\n") +
+                (offer?.Retracted == true ? "The installed release was retracted on the mod DB" +
+                                            (string.IsNullOrEmpty(offer.RetractionReason) ? "." : ": " + Vtml(offer.RetractionReason)) + "\n\n" : "") +
+                "Only the profile you are viewing switches to it; every other profile keeps the version it has. " +
+                "The installed version stays on disk.\n\nInstall it anyway?";
+        }
+
+        /// <summary>
+        /// The version picker's greyed-out mod DB release: download and install exactly that version
+        /// with the update installer, then switch the viewed profile - and only it - to it, as Update
+        /// does. A release not tagged for the running game version asks first, with the tier-2
+        /// question. Runs from the picker's mouse-down, inside the composer's walk: the install raises
+        /// its change on the next frame and the question is a screen pushed on the next frame.
+        /// </summary>
+        private static void InstallPickedVersion(GuiScreenMods screen, ModVersionGroup group, VersionRow row, string profileId)
+        {
+            if (group == null || row?.Version == null) return;
+
+            string modId = group.ModId;
+            string version = row.Version;
+
+            if (row.Compatible)
+            {
+                if (ModUpdateService.StartVersionInstall(group, version, profileId)) screen?.ElementComposer?.Api?.Gui.PlaySound("menubutton");
+                return;
+            }
+
+            string body = OtherGameVersionBody(group, version, row.TaggedFor, null, out string title);
+
+            ShowConfirm(screen, title, body, "Install", confirmed =>
+            {
+                if (!confirmed) return;
+
+                // Re-read after the return trip: OnScreenLoaded republished the groups.
+                if (!GroupsByModId.TryGetValue(modId, out ModVersionGroup fresh)) fresh = group;
+                if (ModUpdateService.StartVersionInstall(fresh, version, profileId))
                 {
                     screen?.ElementComposer?.Api?.Gui.PlaySound("menubutton");
                 }

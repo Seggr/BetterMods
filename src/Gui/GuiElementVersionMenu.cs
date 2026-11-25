@@ -8,6 +8,42 @@ using Vintagestory.Client.NoObf;
 
 namespace BetterMods.Gui
 {
+    /// <summary>One row of the version picker as it is drawn. What it MEANS is the host's business.</summary>
+    public sealed class VersionMenuEntry
+    {
+        /// <summary>The row's main text - a version, or a status line such as "Loading versions...".</summary>
+        public string Text = "";
+
+        /// <summary>Optional short text drawn after <see cref="Text"/> in a quieter colour, e.g. "(1.22)".</summary>
+        public string Hint;
+
+        /// <summary>Draw <see cref="Hint"/> in the game's warning amber rather than the muted text colour.</summary>
+        public bool HintIsWarning;
+
+        /// <summary>Greyed-out text: a version that is not installed, or a status line.</summary>
+        public bool Muted;
+
+        /// <summary>Draw the download symbol in the marker column (a version that is not installed).</summary>
+        public bool Download;
+
+        /// <summary>False for a status line: no hover bar, a click does nothing and the popup stays open.</summary>
+        public bool Clickable = true;
+    }
+
+    /// <summary>What the picker shows: its rows and which one is the current version (-1: none).</summary>
+    public sealed class VersionMenuContent
+    {
+        public VersionMenuEntry[] Entries = new VersionMenuEntry[0];
+        public int SelectedIndex = -1;
+    }
+
+    /// <summary>What a pick does to the popup: close it, or keep it open and re-read the content.</summary>
+    public enum VersionMenuPick
+    {
+        Close,
+        KeepOpen
+    }
+
     /// <summary>
     /// The version picker that drops out of a mod row's version text.
     /// <para>
@@ -77,9 +113,25 @@ namespace BetterMods.Gui
         /// </summary>
         public Func<double> LeftLimit { get; set; }
 
-        private Action<int> onPicked;
+        private Func<int, VersionMenuPick> onPicked;
         private ElementBounds anchorBounds;
         private double anchorAbsY;
+
+        /// <summary>The row the popup hangs off, for re-laying it out when the content changes while open.</summary>
+        private GuiElementModCell anchorCell;
+
+        /// <summary>Where the rows come from. Re-read on every <see cref="Refresh"/>.</summary>
+        private Func<VersionMenuContent> contentSource;
+
+        /// <summary>Polled every frame while open; a change re-reads the content (a release list arrived).</summary>
+        private Func<int> stampSource;
+        private int composedStamp;
+
+        /// <summary>The rows being shown, same length and order as <c>Names</c>.</summary>
+        private VersionMenuEntry[] entries = new VersionMenuEntry[0];
+
+        /// <summary>False when no row is the current version (the base class needs SOME selected index).</summary>
+        private bool selectionShown;
 
         /// <summary>
         /// The frame drawn around the open popup. Vanilla's list menu paints its own background and
@@ -119,6 +171,11 @@ namespace BetterMods.Gui
         /// <summary>Hoisted out of the per-hover bake; neither depends on which row is hovered.</summary>
         private double[] hoverBarColor;
         private CairoFont hoverEntryFont;
+
+        /// <summary>Greyed-out row text (not installed, status lines), its hint, and the amber hint.</summary>
+        private CairoFont mutedFont;
+        private CairoFont hintFont;
+        private CairoFont warningHintFont;
 
         public GuiElementVersionMenu(ICoreClientAPI capi, CairoFont font)
             // One blank placeholder entry, not none: the base constructor sizes its internal arrays
@@ -188,31 +245,36 @@ namespace BetterMods.Gui
 
         /// <summary>
         /// Opens the picker under <paramref name="cell"/>'s version trigger. Returns false - and
-        /// stays closed - if the row has no trigger or the list is empty.
+        /// stays closed - if the row has no trigger or the content is empty.
+        /// <para>
+        /// <paramref name="content"/> is read now and again on every <see cref="Refresh"/>: after a
+        /// pick that answered <see cref="VersionMenuPick.KeepOpen"/>, and whenever
+        /// <paramref name="stamp"/> (polled each frame while open) changes - so a list that arrives
+        /// from the network while the popup is open redraws it in place.
+        /// <paramref name="picked"/> gets the index of a clickable row.
+        /// </para>
         /// </summary>
-        public bool OpenFor(GuiElementModCell cell, string[] names, int selectedIndex, Action<int> picked)
+        public bool OpenFor(GuiElementModCell cell, Func<VersionMenuContent> content, Func<int, VersionMenuPick> picked, Func<int> stamp = null)
         {
             try
             {
-                if (names == null || names.Length == 0) return false;
+                if (cell == null || content == null) return false;
 
                 // The very rectangle the trigger was drawn as, so the popup hangs off the control
                 // rather than off the glyphs inside it.
                 if (!ModCellLayout.TryGetVersionZone(cell, out double triggerX, out double triggerY, out double triggerWidth, out double triggerHeight)) return false;
 
-                // The list menu is a string list; the index is all we need back, so it is the value.
-                string[] values = new string[names.Length];
-                for (int i = 0; i < names.Length; i++) values[i] = i.ToString(CultureInfo.InvariantCulture);
-
-                Values = values;
-                Names = names;
-                SetSelectedIndex(GameMath.Clamp(selectedIndex, 0, names.Length - 1));
+                contentSource = content;
+                stampSource = stamp;
+                composedStamp = ReadStamp();
+                if (!ApplyContent()) return false;
 
                 // No hover until the mouse or a key actually points at something. Starting it on the
                 // selected entry is what made "current" and "pointed at" look like the same state.
                 HoveredIndex = -1;
 
                 onPicked = picked;
+                anchorCell = cell;
                 anchorBounds = cell.Bounds;
                 anchorAbsY = cell.Bounds.absY;
 
@@ -226,12 +288,15 @@ namespace BetterMods.Gui
                 hoverBarColor = (double[])GuiStyle.DialogHighlightColor.Clone();
                 hoverBarColor[3] = 1.0;
                 hoverEntryFont = Font.Clone().WithColor(GuiStyle.DarkBrownColor);
+                mutedFont = Font.Clone().WithColor(Faded(Font.Color, 0.45));
+                hintFont = Font.Clone().WithColor(Faded(Font.Color, 0.6));
+                warningHintFont = Font.Clone().WithColor(Faded(GuiStyle.WarningTextColor ?? new[] { 0.95, 0.79, 0.51, 1.0 }, 0.85));
 
                 Layout(triggerX + triggerWidth, triggerY, triggerY + triggerHeight);
                 ResetHoverBars();
 
                 // A selection below the fold would otherwise open with no visible marker at all.
-                EnsureVisible(SelectedIndex);
+                if (selectionShown) EnsureVisible(SelectedIndex);
 
                 ComposeBody();
                 ComposeFrame();
@@ -252,18 +317,98 @@ namespace BetterMods.Gui
         public void CloseMenu()
         {
             onPicked = null;
+            contentSource = null;
+            stampSource = null;
+            anchorCell = null;
             expanded = false;
         }
 
+        /// <summary>
+        /// Re-reads the content of the OPEN picker and lays it out again against the same row - the
+        /// popup grows or shrinks in place. Closes it if the row cannot be found any more.
+        /// </summary>
+        public void Refresh()
+        {
+            if (!IsOpened || contentSource == null) return;
+
+            try
+            {
+                composedStamp = ReadStamp();
+
+                if (!ModCellLayout.TryGetVersionZone(anchorCell, out double triggerX, out double triggerY, out double triggerWidth, out double triggerHeight)
+                    || !ApplyContent())
+                {
+                    CloseMenu();
+                    return;
+                }
+
+                if (HoveredIndex >= entries.Length) HoveredIndex = -1;
+
+                Layout(triggerX + triggerWidth, triggerY, triggerY + triggerHeight);
+                ResetHoverBars();
+                ComposeBody();
+                ComposeFrame();
+            }
+            catch (Exception e)
+            {
+                BetterModsModSystem.Logger?.Error("[BetterMods] Could not update the version picker.");
+                BetterModsModSystem.Logger?.Error(e);
+                CloseMenu();
+            }
+        }
+
+        /// <summary>Pulls the rows from <see cref="contentSource"/> into the base class's arrays. False when there are none.</summary>
+        private bool ApplyContent()
+        {
+            VersionMenuContent content = contentSource?.Invoke();
+            VersionMenuEntry[] rows = content?.Entries;
+            if (rows == null || rows.Length == 0) return false;
+
+            entries = new VersionMenuEntry[rows.Length];
+            string[] names = new string[rows.Length];
+            string[] values = new string[rows.Length];
+            for (int i = 0; i < rows.Length; i++)
+            {
+                entries[i] = rows[i] ?? new VersionMenuEntry { Clickable = false };
+                names[i] = entries[i].Text ?? "";
+
+                // The list menu is a string list; the index is all we need back, so it is the value.
+                values[i] = i.ToString(CultureInfo.InvariantCulture);
+            }
+
+            Values = values;
+            Names = names;
+
+            selectionShown = content.SelectedIndex >= 0 && content.SelectedIndex < rows.Length;
+            SetSelectedIndex(selectionShown ? content.SelectedIndex : 0);
+            return true;
+        }
+
+        private int ReadStamp()
+        {
+            try
+            {
+                return stampSource?.Invoke() ?? 0;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// The base class's selection callback. Never the route a pick takes here - every input
+        /// handler that would raise it is overridden - but it must not be null.
+        /// </summary>
         private void OnEntryPicked(string value, bool selected)
         {
-            Action<int> handler = onPicked;
-            onPicked = null;
+        }
 
-            if (handler == null || !selected) return;
-            if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index)) return;
-
-            handler(index);
+        private static double[] Faded(double[] color, double alpha)
+        {
+            if (color == null || color.Length < 3) return new[] { 1.0, 1.0, 1.0, alpha };
+            double baseAlpha = color.Length >= 4 ? color[3] : 1.0;
+            return new[] { color[0], color[1], color[2], baseAlpha * alpha };
         }
 
         // ---------------------------------------------------------------- layout
@@ -306,7 +451,7 @@ namespace BetterMods.Gui
             double widestText = 0.0;
             for (int i = 0; i < Names.Length; i++)
             {
-                widestText = Math.Max(widestText, Font.GetTextExtents(Names[i] ?? "").Width);
+                widestText = Math.Max(widestText, Font.GetTextExtents(Names[i] ?? "").Width + HintWidth(i));
             }
 
             popupWidth = Math.Ceiling(Math.Max(
@@ -392,7 +537,7 @@ namespace BetterMods.Gui
                     double textX = framePad + padX + markerWidth + GuiElement.scaled(UnscaledMarkerGap);
 
                     int selected = SelectedIndex;
-                    bool hasSelection = selected >= firstVisible && selected < firstVisible + visibleCount;
+                    bool hasSelection = selectionShown && selected >= firstVisible && selected < firstVisible + visibleCount;
                     double selectedTop = contentTop + (selected - firstVisible) * lineHeight;
 
                     if (hasSelection)
@@ -402,12 +547,18 @@ namespace BetterMods.Gui
                         ctx.Fill();
                     }
 
-                    DrawEntryText(ctx, Font, textX, contentTop, firstVisible, firstVisible + visibleCount);
+                    DrawEntryText(ctx, null, textX, contentTop, firstVisible, firstVisible + visibleCount);
 
                     // Last, so the marker's colour cannot leak into a text fill.
                     if (hasSelection)
                     {
                         DrawMarker(ctx, GuiStyle.ActiveButtonTextColor, framePad + padX, selectedTop, markerWidth, lineHeight);
+                    }
+
+                    for (int i = firstVisible; i < firstVisible + visibleCount && i < entries.Length; i++)
+                    {
+                        if (entries[i]?.Download != true) continue;
+                        DrawDownloadGlyph(ctx, mutedFont?.Color ?? Faded(Font.Color, 0.45), framePad + padX, contentTop + (i - firstVisible) * lineHeight, markerWidth, lineHeight);
                     }
 
                     if (firstVisible > 0) DrawOverflowCue(ctx, width, contentTop / 2.0, up: true);
@@ -466,7 +617,8 @@ namespace BetterMods.Gui
                     // The bar is one line tall and composed at its own origin; the whole texture is
                     // offset onto the right row at render time.
                     DrawEntryText(ctx, hoverEntryFont, framePad + padX + markerWidth + GuiElement.scaled(UnscaledMarkerGap), 0.0, index, index + 1);
-                    if (index == SelectedIndex) DrawMarker(ctx, GuiStyle.DarkBrownColor, framePad + padX, 0.0, markerWidth, lineHeight);
+                    if (selectionShown && index == SelectedIndex) DrawMarker(ctx, GuiStyle.DarkBrownColor, framePad + padX, 0.0, markerWidth, lineHeight);
+                    else if (index < entries.Length && entries[index]?.Download == true) DrawDownloadGlyph(ctx, GuiStyle.DarkBrownColor, framePad + padX, 0.0, markerWidth, lineHeight);
 
                     LoadedTexture bar = hoverBars[row];
                     generateTexture(surface, ref bar);
@@ -495,6 +647,9 @@ namespace BetterMods.Gui
         /// <summary>The hover bar for an entry, baked on first use. Null when it is not in the window.</summary>
         private LoadedTexture HoverBar(int index)
         {
+            // A status line is not a control: no bar, so it never looks clickable.
+            if (index < 0 || index >= entries.Length || entries[index]?.Clickable != true) return null;
+
             int row = index - firstVisible;
             if (row < 0 || row >= hoverBars.Length) return null;
 
@@ -545,17 +700,82 @@ namespace BetterMods.Gui
         /// at <paramref name="firstRowTop"/> - so a one-entry surface can be composed at its own
         /// origin and the whole popup at <see cref="contentTop"/>. Vertical centring is
         /// <see cref="PopupChrome.CentringSlack"/>'s.
+        /// <para>
+        /// <paramref name="font"/> null draws each entry in its own colour - the font's for an
+        /// installed version, greyed for a muted one - with its hint after it; a font forces that
+        /// colour for text and hint alike (the hover bar's dark brown).
+        /// </para>
         /// </summary>
         private void DrawEntryText(Context ctx, CairoFont font, double textX, double firstRowTop, int from, int to)
         {
-            font.SetupContext(ctx);
+            double slack = PopupChrome.CentringSlack(font ?? Font, lineHeight);
+            double hintGap = Font.GetTextExtents(" ").Width;
 
-            double slack = PopupChrome.CentringSlack(font, lineHeight);
-
-            for (int i = from; i < to; i++)
+            for (int i = from; i < to && i < Names.Length; i++)
             {
                 double top = firstRowTop + (i - from) * lineHeight;
-                textUtil.DrawTextLine(ctx, font, Names[i] ?? "", textX, top + slack);
+                VersionMenuEntry entry = i < entries.Length ? entries[i] : null;
+                string text = Names[i] ?? "";
+
+                CairoFont textFont = font ?? (entry?.Muted == true ? mutedFont ?? Font : Font);
+                textFont.SetupContext(ctx);
+                textUtil.DrawTextLine(ctx, textFont, text, textX, top + slack);
+
+                if (string.IsNullOrEmpty(entry?.Hint)) continue;
+
+                CairoFont hint = font ?? (entry.HintIsWarning ? warningHintFont : hintFont) ?? Font;
+                hint.SetupContext(ctx);
+                textUtil.DrawTextLine(ctx, hint, entry.Hint, textX + textFont.GetTextExtents(text).Width + hintGap, top + slack);
+            }
+        }
+
+        /// <summary>Width a row's hint adds after its text (gap included), 0 when it has none.</summary>
+        private double HintWidth(int index)
+        {
+            if (index < 0 || index >= entries.Length || string.IsNullOrEmpty(entries[index]?.Hint)) return 0.0;
+            return Font.GetTextExtents(" ").Width + Font.GetTextExtents(entries[index].Hint).Width;
+        }
+
+        /// <summary>
+        /// The "not installed - click to download" symbol: an arrow pointing down into an open tray,
+        /// centred in the marker column. Stroked paths with round caps and joins, like the card's
+        /// warning triangle and this popup's check, and for the same reason - Cairo's toy font API has
+        /// no glyph fallback, so no U+2B73 / U+1F4E5.
+        /// </summary>
+        private static void DrawDownloadGlyph(Context ctx, double[] color, double x, double y, double width, double height)
+        {
+            double size = Math.Min(width, height) * 0.72;
+            double cx = x + width / 2.0;
+            double top = y + (height - size) / 2.0;
+
+            ctx.Save();
+            try
+            {
+                ctx.LineCap = LineCap.Round;
+                ctx.LineJoin = LineJoin.Round;
+                ctx.LineWidth = Math.Max(1.25, GuiElement.scaled(1.6));
+                ctx.SetSourceRGBA(color);
+
+                // Shaft and head.
+                ctx.NewPath();
+                ctx.MoveTo(cx, top);
+                ctx.LineTo(cx, top + 0.62 * size);
+                ctx.MoveTo(cx - 0.27 * size, top + 0.36 * size);
+                ctx.LineTo(cx, top + 0.62 * size);
+                ctx.LineTo(cx + 0.27 * size, top + 0.36 * size);
+                ctx.Stroke();
+
+                // The tray it lands in.
+                ctx.NewPath();
+                ctx.MoveTo(cx - 0.46 * size, top + 0.66 * size);
+                ctx.LineTo(cx - 0.46 * size, top + size);
+                ctx.LineTo(cx + 0.46 * size, top + size);
+                ctx.LineTo(cx + 0.46 * size, top + 0.66 * size);
+                ctx.Stroke();
+            }
+            finally
+            {
+                ctx.Restore();
             }
         }
 
@@ -612,6 +832,13 @@ namespace BetterMods.Gui
             {
                 CloseMenu();
                 return;
+            }
+
+            // A release list landed (or failed) while the popup was open: redraw it in place.
+            if (stampSource != null && ReadStamp() != composedStamp)
+            {
+                Refresh();
+                if (!IsOpened) return;
             }
 
             try
@@ -886,22 +1113,53 @@ namespace BetterMods.Gui
             return GameMath.Mod(from + delta, Names.Length);
         }
 
-        /// <summary>Commits <paramref name="index"/> and closes. Never re-enters the callback.</summary>
+        /// <summary>
+        /// Hands a clickable row to the host, then closes - or, when the host answers
+        /// <see cref="VersionMenuPick.KeepOpen"/> ("Show all", an in-game note), re-reads the content
+        /// and stays open. A status line does nothing. Never re-enters the callback.
+        /// </summary>
         private void Pick(ICoreClientAPI api, int index)
         {
-            if (Values == null || index < 0 || index >= Values.Length)
+            if (Values == null || index < 0 || index >= Values.Length || index >= entries.Length)
             {
                 CloseMenu();
                 return;
             }
 
-            SetSelectedIndex(index);
+            if (entries[index]?.Clickable != true) return;
 
-            // Not CloseMenu(): that would drop the callback before it has been invoked.
-            expanded = false;
+            Func<int, VersionMenuPick> handler = onPicked;
+            if (handler == null)
+            {
+                CloseMenu();
+                return;
+            }
 
             api.Gui.PlaySound("toggleswitch");
-            OnEntryPicked(Values[index], selected: true);
+
+            VersionMenuPick result;
+            try
+            {
+                // Taken off the element while it runs, so a handler that opens something else cannot
+                // re-enter it. Put back only if the popup stays open.
+                onPicked = null;
+                result = handler(index);
+            }
+            catch (Exception e)
+            {
+                BetterModsModSystem.Logger?.Error("[BetterMods] The version picker's action failed.");
+                BetterModsModSystem.Logger?.Error(e);
+                result = VersionMenuPick.Close;
+            }
+
+            if (result == VersionMenuPick.KeepOpen && IsOpened && contentSource != null)
+            {
+                onPicked = handler;
+                Refresh();
+                return;
+            }
+
+            CloseMenu();
         }
 
         public override void OnFocusLost()

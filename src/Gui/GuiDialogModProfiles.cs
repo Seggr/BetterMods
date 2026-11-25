@@ -415,12 +415,15 @@ namespace BetterMods.Gui
 
                 CairoFont detailFont = CairoFont.WhiteDetailText().WithFontSize((float)GuiStyle.SmallFontSize);
 
+                // Several installed versions, or a mod DB mod with releases to offer.
+                bool hasMenu = VersionMenuSession.HasMenu(group);
+
                 ModCellEntry entry = new ModCellEntry
                 {
                     Title = info.Name + " (" + info.Type + ")",
                     // Elided, because the trigger box is sized around this string and an opaque box
                     // as wide as an exotic version string is a slab over the whole row.
-                    RightTopText = group.HasVersionChoice
+                    RightTopText = hasMenu
                         ? ModCellLayout.ElideVersionLabel(group.VersionLabel, detailFont)
                         : group.VersionLabel,
                     RightTopOffY = 3f,
@@ -432,9 +435,9 @@ namespace BetterMods.Gui
                     DetailTextFont = detailFont
                 };
 
-                // Earns the row a drawn dropdown trigger around its version; a single-version row
-                // keeps the plain label vanilla would have drawn.
-                if (group.HasVersionChoice) ModCellLayout.MarkVersionPicker(entry);
+                // Earns the row a drawn dropdown trigger around its version; a row with nothing to
+                // pick keeps the plain label vanilla would have drawn.
+                if (hasMenu) ModCellLayout.MarkVersionPicker(entry);
 
                 // Same card as the menu screen, minus the Update buttons: nothing is installed in game,
                 // and "Fix dependencies" only switches on what is already installed.
@@ -633,9 +636,9 @@ namespace BetterMods.Gui
                 // the mod.
                 if (ModCard.TryClick(cell, capi.Input.MouseX, capi.Input.MouseY)) return;
 
-                // Only consulted for mods that actually have something to choose between, so a
-                // normal row still toggles from anywhere.
-                if (group.HasVersionChoice && ModCellLayout.IsInVersionZone(cell, capi.Input.MouseX, capi.Input.MouseY))
+                // Only consulted for rows that got the trigger (ModCellLayout.HasVersionPicker - what
+                // HasMenu marked at build time), so a normal row still toggles from anywhere.
+                if (ModCellLayout.HasVersionPicker(cell.cell) && ModCellLayout.IsInVersionZone(cell, capi.Input.MouseX, capi.Input.MouseY))
                 {
                     OpenVersionMenu(cell, group);
                     return;
@@ -734,11 +737,34 @@ namespace BetterMods.Gui
 
             string profileId = ViewedProfileId;
 
-            bool opened = menu.OpenFor(cell, group.VersionNames(), group.SelectedIndex, index =>
+            // Mod DB releases are listed here too, greyed out with the download symbol - but installing
+            // is a main-menu job (the menu's mod list cannot be refreshed in a world), so clicking one
+            // only says so, and the popup stays open.
+            VersionMenuSession session = new VersionMenuSession(group, canInstall: false);
+            session.Begin();
+
+            bool opened = menu.OpenFor(cell, session.Build, index =>
             {
-                ModGrouping.SelectVersion(profileId, group, index);
-                RecomposeDeferred();
-            });
+                VersionRow row = session.RowAt(index);
+                switch (row?.Kind)
+                {
+                    case VersionRowKind.Installed:
+                        ModGrouping.SelectVersion(profileId, group, row.InstalledIndex);
+                        RecomposeDeferred();
+                        return VersionMenuPick.Close;
+
+                    case VersionRowKind.ShowAll:
+                        session.ExpandAll();
+                        return VersionMenuPick.KeepOpen;
+
+                    case VersionRowKind.Available:
+                        session.NoteMainMenuOnly(row.Version);
+                        return VersionMenuPick.KeepOpen;
+
+                    default:
+                        return VersionMenuPick.KeepOpen;
+                }
+            }, VersionMenuSession.Stamp);
             if (!opened) return;
 
             // Focus is what makes the composer close the popup again when the next click lands

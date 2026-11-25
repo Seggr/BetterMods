@@ -189,8 +189,7 @@ namespace BetterMods.Gui
                     // Major.minor is enough when the older version is a previous minor ("1.22" on
                     // 1.23.x); within the running minor (1.23.0 on 1.23.1) only the full version
                     // tells the player it is not their own.
-                    string olderShort = ModUpdateRules.MajorMinor(offer.OlderGameVersion);
-                    if (olderShort == ModUpdateRules.MajorMinor(ModUpdateService.GameVersionChecked)) olderShort = offer.OlderGameVersion;
+                    string olderShort = ModUpdateRules.GameVersionLabel(offer.OlderGameVersion, ModUpdateService.GameVersionChecked);
                     string label = target + " (" + ModUpdateRules.AsciiLine(olderShort, 12) + ")";
                     ModCard.AddButton(cell, canInstall && actions.InstallOlderRelease != null
                         ? new ModCardButton("Update to " + label, ModCardButtonPriority.Essential, ModCardButtonStyle.WarningButton, () => actions.InstallOlderRelease(group))

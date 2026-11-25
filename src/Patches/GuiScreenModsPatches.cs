@@ -134,10 +134,11 @@ namespace BetterMods.Patches
 
                     cell.Enabled = group.Enabled;
 
-                    // Only touched when there is a choice, so a single-version row stays byte for
-                    // byte the row vanilla built. The label itself is still just the version - the
-                    // mark is what earns the row a drawn dropdown trigger in GuiElementModCell.
-                    if (group.HasVersionChoice)
+                    // Only touched when there is a choice - several installed versions, or a mod DB
+                    // mod with releases to offer - so any other row stays byte for byte the row
+                    // vanilla built. The label itself is still just the version - the mark is what
+                    // earns the row a drawn dropdown trigger in GuiElementModCell.
+                    if (VersionMenuSession.HasMenu(group))
                     {
                         // Elided, because the trigger box is sized around this string and an opaque
                         // box as wide as an exotic version string is a slab over the whole row.
@@ -252,7 +253,7 @@ namespace BetterMods.Patches
         private static bool TryOpenVersionMenu(GuiScreenMods screen, GuiElementModCell element)
         {
             ModVersionGroup group = ModsScreenProfileUi.GroupFor(element?.cell?.Mod);
-            if (group == null || !group.HasVersionChoice) return false;
+            if (group == null || !ModCellLayout.HasVersionPicker(element.cell)) return false;
 
             ICoreClientAPI api = screen.ElementComposer?.Api;
             if (api == null) return false;

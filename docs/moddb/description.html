@@ -175,6 +175,7 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 </div>
 <ul>
 <li style="margin: 6px 0;"><strong>Several versions of one mod</strong> share one card. Click the arrow on the version label and pick one: it is switched on in the viewed profile and the others are switched off.</li>
+<li style="margin: 6px 0;"><strong>Every mod DB version:</strong> for a mod on the mod DB the drop-down also lists every release it has (newest first) - greyed out with a download symbol when not installed, with a hint like <strong>(1.22)</strong> when not tagged for your game version. Click one to download it and switch the viewed profile to it, like Update (another game version asks first; the other versions stay). Long lists show installed + the newest 10, then <strong>Show all</strong>. Main menu only - in game it says so.</li>
 <li style="margin: 6px 0;"><strong>Restart notice:</strong> the game cannot swap the code of a mod it already loaded this session. Pointing a profile at a <em>different version</em> of such a mod shows "Restart needed - version changed". Never after a fresh launch, for mods that are off, for content-only mods, or for plain enable/disable.</li>
 </ul>
 </div>
@@ -311,7 +312,11 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">One lookup of that mod's page address (cached for the session)</td>
 </tr>
 <tr>
-<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Update, Update all, Fix dependencies</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">First open of a mod's version drop-down (mods on the mod DB)</td>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">One request for that mod's release list (cached for the session)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Update, Update all, Fix dependencies, a not-installed version in the drop-down</td>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7;">Downloads of the releases you chose</td>
 </tr>
 </tbody>

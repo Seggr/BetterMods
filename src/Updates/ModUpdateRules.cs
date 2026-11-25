@@ -263,6 +263,20 @@ namespace BetterMods.Updates
             return parts.Length >= 2 ? parts[0] + "." + parts[1] : version.Trim();
         }
 
+        /// <summary>
+        /// The short label for a game version that is not the running one - what the tier-2 card
+        /// button and the version picker's "(1.22)" hint carry. Major.minor is enough when it is a
+        /// different minor (<c>"1.22"</c> on 1.23.x); within the running minor (1.23.0 on 1.23.1) only
+        /// the full version tells the player it is not their own.
+        /// </summary>
+        public static string GameVersionLabel(string otherGameVersion, string runningGameVersion)
+        {
+            if (string.IsNullOrWhiteSpace(otherGameVersion)) return "";
+
+            string label = MajorMinor(otherGameVersion);
+            return label == MajorMinor(runningGameVersion) ? otherGameVersion.Trim() : label;
+        }
+
         // ---------------------------------------------------------------- specs
 
         /// <summary>
@@ -401,19 +415,19 @@ namespace BetterMods.Updates
             return entries;
         }
 
-        private static JToken GetIgnoreCase(JObject obj, string name)
+        internal static JToken GetIgnoreCase(JObject obj, string name)
         {
             return obj?.GetValue(name, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static string ReadString(JToken token)
+        internal static string ReadString(JToken token)
         {
             if (token == null || token.Type == JTokenType.Null) return null;
             if (token.Type == JTokenType.String || token.Type == JTokenType.Integer || token.Type == JTokenType.Float) return token.ToString();
             return null;
         }
 
-        private static int ReadInt(JToken token)
+        internal static int ReadInt(JToken token)
         {
             if (token == null) return 0;
             if (token.Type == JTokenType.Integer) return (int)(long)token;
