@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -190,33 +189,11 @@ namespace BetterMods.Hook
 
         private static void Run()
         {
-            List<string> candidates = HookPaths.FindModAssemblies(out List<string> searched);
-
-            if (candidates.Count == 0)
-            {
-                // Not finding the mod is a no-op, not a failure - the player may have uninstalled it
-                // and left the hook configured, and that has to stay harmless. But it is never
-                // silent: an unexplained "the tabs are not there" is indistinguishable from a bug,
-                // and the list of places that were looked at is what turns it into an answer.
-                HookLog.Write("Did nothing: no " + HookPaths.ModAssemblyFileName + " found. Looked for a mod " +
-                              "folder containing it in, and for an unpacked .zip mod under, these paths: " +
-                              Describe(searched) + ". If BetterMods is installed as a .zip, load any world once - " +
-                              "the game unpacks the archive at world load, and this hook can use it from the " +
-                              "next launch onwards. If BetterMods was removed on purpose this is harmless; to stop " +
-                              "it entirely, delete the 'Vintage Story (BetterMods)' shortcut and the " +
-                              "ModConfig\\BetterMods folder.");
-                return;
-            }
-
-            if (candidates.Count > 1)
-            {
-                HookLog.Write("Skipped: found " + candidates.Count + " installed copies of " +
-                              HookPaths.ModAssemblyFileName + " (" + Describe(candidates) +
-                              "). Remove all but one.");
-                return;
-            }
-
-            string modPath = candidates[0];
+            // Which BetterMods the game will load, and the one path it will load it from - a zip
+            // install is unpacked into the game's own cache folder for it first if need be. Every
+            // "no" is logged inside, with the reason.
+            string modPath = HookModLocator.Locate();
+            if (modPath == null) return;
 
             string harmonyPath = HookPaths.HarmonyPath;
             if (!File.Exists(harmonyPath))
@@ -278,11 +255,6 @@ namespace BetterMods.Hook
             // BetterMods off in the mod manager, and that decision belongs to the mod, which has the
             // game's own parsed ClientSettings in hand. It logs its own line in that case.
             HookLog.Write("Loaded BetterMods from '" + DescribeLocation(mod) + "' and asked it to install its patches.");
-        }
-
-        private static string Describe(List<string> paths)
-        {
-            return paths == null || paths.Count == 0 ? "<none>" : string.Join("; ", paths);
         }
 
         private static string DescribeLocation(Assembly mod)

@@ -327,7 +327,7 @@ exec '&lt;game folder&gt;/Vintagestory' "$@"</pre>
 <div class="spoiler-text" style="padding: 14px 18px; line-height: 1.6; border-top: 1px solid #ddd3c2;">
 <ul>
 <li style="margin: 6px 0;"><strong>No tabs on the main menu?</strong> Load a world once, or use Add Shortcut. With the hook, check <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Logs\bettermods-hook.log</code>.</li>
-<li style="margin: 6px 0;"><strong>Zip install + hook:</strong> the first launch after installing or updating BetterMods is vanilla until a world loads (the game only unpacks zips then). Folder installs have no gap.</li>
+<li style="margin: 6px 0;"><strong>Zip install + hook:</strong> the very first install still needs one world load (the hook only exists once BetterMods has run). After that the hook unpacks a new or updated BetterMods zip itself, so the first launch after an update already has the tabs. Folder installs have no gap.</li>
 <li style="margin: 6px 0;"><strong>"Restart needed - version changed"?</strong> You picked another version of a mod you already played with this session. Restart, or pick the version you were using.</li>
 <li style="margin: 6px 0;"><strong>"No newer releases for 1.23.0-pre.1"?</strong> Not "up to date" - nothing on the DB is tagged for your exact version yet.</li>
 <li style="margin: 6px 0;"><strong>Applied a profile in game and nothing changed?</strong> It takes effect at the next world load.</li>

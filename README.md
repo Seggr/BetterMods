@@ -570,8 +570,10 @@ to its log, and the game starts normally.
 
 - **Main menu needs a world load or the startup hook** - without the hook, the Mods screen is
   vanilla until you have loaded a world once that session.
-- **Zip install + hook:** the first launch after installing or updating a zipped BetterMods is
-  vanilla until a world loads (the game only unpacks zip mods then). Folder installs have no gap.
+- **Zip install + hook:** the very first install still needs one world load, because the hook only
+  exists once BetterMods has run. After that, the hook unpacks a new or updated BetterMods zip
+  itself (into the same cache folder the game would use), so the first launch after an update
+  already has the tabs. Folder installs have no gap.
 - **In game, Apply Profile waits for the next world load** - mods cannot be unloaded from a running
   world.
 - **Changing the version of a mod already used this session needs a game restart.**
