@@ -179,6 +179,7 @@ namespace BetterMods.Updates
         private static readonly Dictionary<string, ModDbRecord> Records = new Dictionary<string, ModDbRecord>(StringComparer.OrdinalIgnoreCase);
         private static readonly HashSet<string> Installing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, string> InstallErrors = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, string> InstallTargets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         private static int generation;
         private static CancellationTokenSource checkCancel;
@@ -255,6 +256,9 @@ namespace BetterMods.Updates
         public static void Recheck()
         {
             InstallSummary = null;
+
+            // "Check again" means fresh answers: the version pickers' release lists too.
+            ModReleaseCatalog.Clear();
             StartCheck(notify: true);
         }
 
@@ -709,6 +713,14 @@ namespace BetterMods.Updates
         /// null <c>IsModBlocked</c> answers true for everything (NOTES, "Mod enable/disable
         /// persistence"), and the installer re-checks with the list loaded before downloading.
         /// </summary>
+        public static bool IsReleaseBlocked(string modId, string version) => IsBlocked(modId, version);
+
+        /// <summary>The version an install run is fetching for <paramref name="modId"/> right now, or null.</summary>
+        public static string InstallingVersion(string modId)
+        {
+            return !string.IsNullOrEmpty(modId) && InstallTargets.TryGetValue(modId, out string version) ? version : null;
+        }
+
         private static bool IsBlocked(string modId, string version)
         {
             try
@@ -850,10 +862,94 @@ namespace BetterMods.Updates
             }
         }
 
+        /// <summary>
+        /// The version picker's not-installed row: downloads and installs exactly
+        /// <paramref name="version"/> of <paramref name="group"/>'s mod with the update installer
+        /// (blocklist, <c>install-information</c> re-query for that release's file, validated file
+        /// name, allowed hosts, archive identity, never overwriting, the old versions kept) and folds
+        /// it into the profiles exactly as an update is: <paramref name="viewedProfileId"/> - and only
+        /// it - switches to the new version (a profile that has the mod off only remembers it), every
+        /// other profile is pinned to what it had.
+        /// <para>
+        /// The outcome goes to the status line ("Installed x y" / "Could not install x y: why"), not
+        /// to the card's "last update attempt failed" line - this was not an update. False when
+        /// nothing was started: another install running (status line says so), the config unreadable,
+        /// in a world (the menu's mod list cannot be refreshed there), a version the DB cannot be asked
+        /// for, or one that is already installed. Main thread only. Never throws.
+        /// </para>
+        /// </summary>
+        public static bool StartVersionInstall(ModVersionGroup group, string version, string viewedProfileId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(group?.ModId) || string.IsNullOrWhiteSpace(version)) return false;
+                if (BetterModsModSystem.ClientApi != null) return false;
+
+                string modId = group.ModId;
+                version = version.Trim();
+
+                if (IsInstalling)
+                {
+                    ReportSummary("Not installing " + modId + " " + version + " - wait for the running install to finish", isError: true);
+                    return false;
+                }
+
+                if (ProfileStore.PersistenceSuspended)
+                {
+                    ReportSummary("Not installing " + modId + " " + version + " - profile config unreadable", isError: true);
+                    return false;
+                }
+
+                if (ModUpdateRules.ReleaseSpec(modId, version) == null)
+                {
+                    ReportSummary("Could not install " + modId + " " + version + ": the mod DB cannot be asked for that version", isError: true);
+                    return false;
+                }
+
+                string key = modId + "@" + version;
+                if (group.Keys.Any(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase))) return false;
+
+                InstallJob job = new InstallJob
+                {
+                    ModId = modId,
+                    TargetVersion = version,
+                    ExistingKeys = new List<string>(group.Keys)
+                };
+
+                StartJobs(new List<InstallJob> { job }, viewedProfileId, "Installing " + ModUpdateRules.AsciiLine(modId + " " + version, 60), jobList =>
+                {
+                    InstallJob done = jobList.FirstOrDefault();
+                    if (done?.InstalledKey != null)
+                    {
+                        InstallSummary = ModUpdateRules.AsciiLine("Installed " + done.ModId + " " + done.TargetVersion, 300);
+                        InstallSummaryIsError = false;
+                    }
+                    else
+                    {
+                        InstallSummary = ModUpdateRules.AsciiLine("Could not install " + modId + " " + version + ": " + (done?.Error ?? "unexpected error"), 300);
+                        InstallSummaryIsError = true;
+                    }
+                });
+
+                BetterModsModSystem.Logger?.Notification("[BetterMods] Installing " + key + " from the version picker.");
+                return true;
+            }
+            catch (Exception e)
+            {
+                BetterModsModSystem.Logger?.Error("[BetterMods] Could not start installing a mod version.");
+                BetterModsModSystem.Logger?.Error(e);
+                return false;
+            }
+        }
+
         /// <summary>The shared start of an install run. Caller has checked <see cref="IsInstalling"/> and built the jobs.</summary>
         private static void StartJobs(List<InstallJob> jobs, string viewedProfileId, string label, Action<List<InstallJob>> onFinished)
         {
-            foreach (InstallJob job in jobs) Installing.Add(job.ModId);
+            foreach (InstallJob job in jobs)
+            {
+                Installing.Add(job.ModId);
+                InstallTargets[job.ModId] = job.TargetVersion;
+            }
 
             InstallTotal = jobs.Count;
             InstallLabel = label;
@@ -1155,6 +1251,7 @@ namespace BetterMods.Updates
             foreach (InstallJob job in jobs)
             {
                 Installing.Remove(job.ModId);
+                InstallTargets.Remove(job.ModId);
 
                 if (job.InstalledKey != null)
                 {

@@ -268,6 +268,16 @@ All installed versions of a mod share **one card**. Click the drop-down arrow on
 and pick a version: it is switched on in the **viewed profile** and the others are switched off, so
 each profile can use a different version.
 
+**Every mod DB version.** For a mod the update check found on the mod DB, the drop-down also lists
+every release the DB has for it - so a mod with only one version installed gets the drop-down too.
+Newest first, installed and not-installed mixed: not-installed versions are greyed out with a
+download symbol, and a release not tagged for your game version carries a hint such as **(1.22)**.
+Clicking one downloads and installs that version (the others stay installed) and switches the
+**viewed profile** to it, exactly like **Update**; a release for another game version asks first.
+Long lists show your installed versions and the newest 10 others, plus **Show all N versions**.
+Installing is main-menu only: in game, those versions are listed but clicking one only says
+"install from the main menu". The list is fetched the first time you open a mod's drop-down.
+
 ![Two installed versions of one mod: the version drop-down open under the version label, the one in use ticked](docs/moddb/screenshots/03-version-dropdown.png)
 
 **Restart notice.** The game cannot swap the code of a mod it has already loaded this session. If
@@ -513,7 +523,8 @@ and its download server:
 |---|---|
 | First time per session you open the Mods screen or the in-game dialog; Reload Mods; the status button | The update check: your game version and the ids and versions of your installed mods (core mods and BetterMods excluded), plus the DB's list of game versions. |
 | You click **Open mod page** | One lookup of that mod's page address (cached for the session). |
-| You click **Update**, **Update all** or **Fix dependencies** | Downloads of the releases you chose. |
+| You first open a mod's version drop-down (mods found on the mod DB only) | One request for that mod's list of releases (cached for the session). |
+| You click **Update**, **Update all** or **Fix dependencies**, or a not-installed version in the drop-down | Downloads of the releases you chose. |
 
 Nothing else: no telemetry, no other sites. Opening a mod page hands the address to your browser.
 
