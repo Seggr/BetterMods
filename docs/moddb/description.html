@@ -70,7 +70,7 @@
 <tbody>
 <tr>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece; width: 90px;"><strong>Target</strong></td>
-<td style="padding: 7px 10px; border: 1px solid #e1d8c7; background: #fffdf8; word-break: break-all;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%SystemRoot%\System32\cmd.exe /c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td>
+<td style="padding: 7px 10px; border: 1px solid #e1d8c7; background: #fffdf8; word-break: break-all;"><code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%SystemRoot%\System32\cmd.exe /d /v:on /c set "H=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" &amp; (if exist "!H!" set "DOTNET_STARTUP_HOOKS=!H!") &amp; start "" "GAMEFOLDER\Vintagestory.exe"</code></td>
 </tr>
 <tr>
 <td style="vertical-align: top; padding: 7px 10px; border: 1px solid #e1d8c7; background: #e7dece;"><strong>Start in</strong></td>
@@ -86,7 +86,7 @@
 </tr>
 </tbody>
 </table>
-<p>Replace <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">GAMEFOLDER</code> with your install folder (installer default: <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for both hook paths and add <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
+<p>Replace <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">GAMEFOLDER</code> with your install folder (installer default: <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">%APPDATA%\Vintagestory</code>). With a custom data folder, use <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">&lt;data folder&gt;\ModConfig\BetterMods\BetterModsHook.dll</code> for the hook path and add <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">--dataPath "&lt;data folder&gt;"</code> at the end.</p>
 <p>If the Target box cuts the line off (about 260 characters), save this as <code style="background: #efe8da; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;">Vintage Story (BetterMods).cmd</code> and launch from it instead:</p>
 <pre style="background: #f4efe4; border: 1px solid #e3d7bd; border-radius: 6px; padding: 10px 12px; overflow: auto; line-height: 1.45;">@echo off
 set "HOOK=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll"

@@ -101,7 +101,7 @@ fails, the Mods screen says "Add Shortcut failed" and the card's tooltip gives t
 It runs minimised, in the game folder, with the game's icon:
 
 ```bat
-%SystemRoot%\System32\cmd.exe /c if exist "<hook>" (set "DOTNET_STARTUP_HOOKS=<hook>") & start "" "<game folder>\Vintagestory.exe"
+%SystemRoot%\System32\cmd.exe /d /v:on /c set "H=<hook>" & (if exist "!H!" set "DOTNET_STARTUP_HOOKS=!H!") & start "" "<game folder>\Vintagestory.exe"
 ```
 
 `<hook>` is `%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll`; `--dataPath` is
@@ -126,7 +126,7 @@ Right-click the desktop > **New > Shortcut** and set:
 | Field | Value |
 |---|---|
 | Program | `%SystemRoot%\System32\cmd.exe` |
-| Arguments | `/c if exist "%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" (set "DOTNET_STARTUP_HOOKS=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll") & start "" "<GAME FOLDER>\Vintagestory.exe"` |
+| Arguments | `/d /v:on /c set "H=%APPDATA%\VintagestoryData\ModConfig\BetterMods\BetterModsHook.dll" & (if exist "!H!" set "DOTNET_STARTUP_HOOKS=!H!") & start "" "<GAME FOLDER>\Vintagestory.exe"` |
 | Start in | `<GAME FOLDER>` |
 | Run | Minimized |
 | Change Icon | `<GAME FOLDER>\Vintagestory.exe` |
@@ -134,7 +134,7 @@ Right-click the desktop > **New > Shortcut** and set:
 - The **Target** box takes the program and the arguments together, separated by a space.
 - Replace `<GAME FOLDER>` with your install folder (the installer's default is
   `%APPDATA%\Vintagestory`).
-- With a custom data folder, change both hook paths to
+- With a custom data folder, change the hook path to
   `<your data folder>\ModConfig\BetterMods\BetterModsHook.dll` and add
   `--dataPath "<your data folder>"` after `Vintagestory.exe"`.
 
